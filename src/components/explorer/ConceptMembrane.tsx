@@ -38,7 +38,7 @@ export function ConceptMembrane({ paths }: { paths: PathVisibility }) {
     return () => { cancelled = true; instance?.dispose(); controller.current = null }
   }, [])
   return <section className="concept-model" aria-label="전자전달과 H⁺ 축적의 움직이는 3D 개념 모형" data-testid="concept-model" data-render-mode={mode} data-paused={paused || preferences.reducedMotion}>
-    <header><div><span className="concept-kicker">내막에서 일어나는 세 가지 흐름</span><p>전자는 전달되고, H⁺는 막을 건넙니다.</p></div><button className="button" disabled={mode !== '3d' || preferences.reducedMotion} aria-pressed={paused || preferences.reducedMotion} onClick={() => setPaused(v => !v)}>{paused ? '움직임 재개' : '움직임 일시정지'}</button></header>
+    <header><p className="concept-kicker">내막에서 일어나는 세 가지 흐름</p><button className="button" disabled={mode !== '3d' || preferences.reducedMotion} aria-pressed={paused || preferences.reducedMotion} onClick={() => setPaused(v => !v)}>{paused ? '움직임 재개' : '움직임 일시정지'}</button></header>
     <div className="concept-scene" role="img" aria-label="위는 막사이공간, 가운데는 내막, 아래는 기질. 전자는 운반체를 따라 전달됩니다. H⁺는 위로 펌핑되어 축적되고 ATP 합성효소를 통해 아래로 돌아옵니다.">
       <canvas ref={canvas} aria-hidden="true" style={{ visibility: mode === '3d' ? 'visible' : 'hidden' }} />
       <ConceptLabels paths={paths} fallback={mode !== '3d'} />

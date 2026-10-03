@@ -7,13 +7,13 @@ import { Photosynthesis, LightFlow } from './Photosynthesis'
 
 describe('scientific content invariants', () => {
   it('locates glycolysis in cytosol and pyruvate oxidation in matrix', () => {
-    expect(respirationSteps[0].location).toContain('Cytosol')
-    expect(respirationSteps[1].location).toContain('matrix')
+    expect(respirationSteps[0].location).toBe('세포질')
+    expect(respirationSteps[1].location).toBe('미토콘드리아 기질')
   })
   it('preserves carbon and carrier totals for one glucose', () => {
     expect(respirationSteps[0].output).toContain('순 ATP 2')
     expect(respirationSteps[1].output).toContain('CO₂ 2')
-    expect(respirationSteps[2].output).toBe('CO₂ 4 · NADH 6 · FADH₂ 2 · GTP/ATP 2')
+    expect(respirationSteps[2].output).toBe('CO₂ 4 · NADH 6 · FADH₂ 2 · ATP 2 상당')
   })
   it('explicitly excludes Complex II pumping and locates O₂ use at IV', () => {
     expect(respirationSteps[3].detail).toContain('Complex II는 전자를 전달하지만 H⁺를 펌프하지 않습니다')
@@ -42,7 +42,7 @@ describe('scientific content invariants', () => {
     expect(html).toContain('NADP⁺ reductase')
   })
   it('rendered lessons retain teaching distinctions and the G3P precursor', () => {
-    expect(renderToStaticMarkup(<Respiration mark={() => {}} />)).toContain('아직 ATP synthase를 이용하는 화학삼투는 아니다')
+    expect(renderToStaticMarkup(<Respiration mark={() => {}} />)).toContain('ATP 합성효소를 이용하는 화학삼투와는 다릅니다')
     expect(renderToStaticMarkup(<Photosynthesis mark={() => {}} />)).toContain('탄수화물의 전구체')
   })
   it('each quiz has three valid, explained answers', () => {

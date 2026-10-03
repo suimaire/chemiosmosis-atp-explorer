@@ -11,7 +11,7 @@ describe('early Explorer teaching structure', () => {
     const html = renderToStaticMarkup(<Explorer />)
     expect(html.match(/<nav class="module-nav"[\s\S]*?<\/nav>/)![0].match(/<button/g)).toHaveLength(6)
     expect(html).toContain('00 · 전자전달과 H⁺ 축적')
-    expect(html).toContain('INVESTIGATION / 0')
+    expect(html).toContain('단계 00 / 05')
     expect(html).not.toContain('어디에 축적되는가?')
     expect(html).not.toContain('전자와 H⁺는 같은 길을 가는가?')
     expect(html).toContain('같은 길을 이동하지 않습니다.')

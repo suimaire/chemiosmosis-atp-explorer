@@ -1,0 +1,190 @@
+.respiration-pathway{margin-top:24px;min-width:0}
+.respiration-detail .respiration-detail-heading{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px 24px}
+.respiration-detail .mode-control{display:flex;align-items:center;gap:12px}
+.respiration-detail .mode-hint{font-size:14px;color:var(--text-3)}
+.respiration-detail .respiration-detail-heading h2{margin-bottom:0}
+.respiration-detail .respiration-detail-heading .eyebrow{margin-bottom:7px}
+.respiration-detail .respiration-mode-toggle{flex-shrink:0;min-height:44px;padding:8px 18px;border:1px solid var(--accent);border-radius:6px;background:#fff;font-size:15px;font-weight:600;color:var(--accent-ink)}
+.respiration-detail .respiration-mode-toggle:hover{background:var(--accent-soft)}
+.respiration-detail .respiration-mode-toggle[aria-expanded=true]{background:var(--accent-soft)}
+.respiration-detail .detail-intro>p{margin-top:20px}
+.basic-pathway .basic-lead{font-size:16px;color:var(--text-2);margin:10px 0 22px;line-height:1.8}
+.basic-pathway .basic-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:0;margin:0;list-style:none}
+.basic-pathway .basic-flow>li,.basic-pathway .basic-cycle-events>li{position:relative;padding:18px;background:#fff;border:1px solid var(--line-strong);border-radius:8px;min-width:0}
+.basic-pathway .basic-flow>li+li::before{content:'→';position:absolute;left:-16px;top:47%;width:16px;text-align:center;color:#5c7753;font-size:16px}
+.basic-pathway .basic-phase{display:block;font-size:13px;color:var(--text-3);margin-bottom:8px}
+.basic-pathway h4{line-height:1.55;font-size:17px;word-break:keep-all;margin:0 0 10px}
+.basic-pathway h4>span{color:#5a774b}
+.basic-pathway .basic-molecule{font-size:16px;text-align:center;line-height:1.8;margin:0;padding:12px 0;color:#34513a}
+.basic-pathway .basic-molecule b{font-size:14px;font-weight:650;white-space:nowrap}
+.basic-pathway .basic-arrow{display:block;color:#839574;font-size:23px;line-height:1.7}
+.basic-pathway .carbon-pair b{display:inline-block;padding:2px 13px;border:1px solid #bfceb6;border-radius:18px;background:#eff4e8}
+.basic-pathway .basic-product{display:block;text-align:center;padding:7px 10px;background:#e5eedc;border-radius:4px;font-size:15px;color:#31583d;margin:10px 0}
+.basic-pathway .basic-product.investment{background:#f2eade;color:#805b34}
+.basic-pathway .basic-product.carrier{background:#e8eef4;color:#415f7d}
+.basic-pathway .basic-flow>li>p,.basic-pathway .basic-cycle-events>li>p:not(.basic-molecule){font-size:14px;line-height:1.75;margin:10px 0 0;color:var(--text-2)}
+.basic-pathway .basic-footnote{font-size:14px;line-height:1.8;color:var(--text-3);margin:12px 0 0;max-width:900px}
+.basic-pathway .basic-ledger{gap:14px 22px}
+.basic-pathway .basic-ledger>strong{font-size:17px}
+.basic-pathway .basic-pdh-diagram{margin:0;padding:24px;border:1px solid var(--line-strong);background:#fff;border-radius:8px}
+.basic-pathway .basic-pdh-flow{display:grid;grid-template-columns:1fr 28px 1.5fr 28px 1fr;gap:16px;align-items:center}
+.basic-pathway .basic-endpoint{text-align:center;font-size:18px;font-weight:600}
+.basic-pathway .basic-endpoint>strong{display:block;margin-top:12px;font-size:28px;color:#476d3b}
+.basic-pathway .basic-connector{text-align:center;font-size:26px;color:#799065}
+.basic-pathway .basic-coupled-events{border:1px dashed #a8b99a;border-radius:8px;padding:18px;text-align:center;background:#f7f9f0}
+.basic-pathway .basic-coupled-events ul{list-style:none;padding:0;margin:0;font-size:16px;line-height:2}
+.basic-pathway .basic-pdh-diagram figcaption{text-align:center;font-size:14px;line-height:1.8;color:var(--text-3);margin-top:20px}
+.basic-pathway .basic-equation{margin-top:16px;padding:14px 18px;background:var(--surface);border-left:3px solid #7f9c86;border-radius:0 6px 6px 0}
+.basic-pathway .basic-equation>span{font-size:13px;color:var(--text-3)}
+.basic-pathway .basic-equation p{margin:8px 0 0;font-size:18px;line-height:1.9;color:#31543a}
+.basic-pathway .basic-cycle{position:relative;margin:22px 0}
+.basic-pathway .basic-cycle-events{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:'entry carbon' 'regeneration carriers';gap:76px 150px;padding:0;margin:0;list-style:none}
+.basic-pathway .basic-cycle-events>li:nth-child(1){grid-area:entry}
+.basic-pathway .basic-cycle-events>li:nth-child(2){grid-area:carbon}
+.basic-pathway .basic-cycle-events>li:nth-child(3){grid-area:carriers}
+.basic-pathway .basic-cycle-events>li:nth-child(4){grid-area:regeneration}
+.basic-pathway .basic-cycle-events>li::after{position:absolute;color:#708c61;font-size:30px;line-height:1}
+.basic-pathway .basic-cycle-events>li:nth-child(1)::after{content:'→';right:-91px;top:45%}
+.basic-pathway .basic-cycle-events>li:nth-child(2)::after{content:'↓';bottom:-55px;left:48%}
+.basic-pathway .basic-cycle-events>li:nth-child(3)::after{content:'←';left:-91px;top:45%}
+.basic-pathway .basic-cycle-events>li:nth-child(4)::after{content:'↑';top:-55px;left:48%}
+.basic-pathway .basic-cycle-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:130px;height:130px;border-radius:50%;border:1px solid #b4c6a6;background:#e9f0df;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#395d36}
+.basic-pathway .basic-cycle-center>span{font-size:30px;line-height:1.1}
+.basic-pathway .basic-cycle-center>strong{font-size:20px;line-height:1.7}
+.basic-pathway .basic-cycle-center>small{font-size:12px}
+.basic-pathway .basic-carriers{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:12px 0;color:#405e7b;font-size:18px}
+@media(max-width:1100px){.basic-pathway .basic-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.basic-pathway .basic-flow>li+li::before{content:none}.basic-pathway .basic-cycle-events{column-gap:120px}.basic-pathway .basic-cycle-center{width:108px;height:108px}.basic-pathway .basic-cycle-events>li:nth-child(1)::after{right:-77px}.basic-pathway .basic-cycle-events>li:nth-child(3)::after{left:-77px}}
+@media(max-width:760px){
+ .respiration-detail .respiration-detail-heading{align-items:flex-start;flex-direction:column;gap:12px}
+ .respiration-detail .mode-control{flex-direction:row-reverse;justify-content:flex-end;flex-wrap:wrap}
+ .respiration-detail .respiration-detail-heading h2{font-size:21px}
+ .respiration-detail .respiration-mode-toggle{font-size:14px;padding-inline:14px}
+ .basic-pathway .basic-flow{grid-template-columns:1fr;gap:22px}
+ .basic-pathway .basic-flow>li+li::before{content:'↓';top:-25px;left:calc(50% - 8px);font-size:20px}
+ .basic-pathway .basic-flow>li,.basic-pathway .basic-cycle-events>li{padding:18px}
+ .basic-pathway .basic-lead{font-size:14px}
+ .basic-pathway .basic-ledger>span:first-child{flex-basis:auto}
+
+ .basic-pathway .pathway-ledger.basic-ledger{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+
+ .basic-pathway .basic-ledger>strong{grid-column:1/-1}
+ .basic-pathway .basic-pdh-diagram{padding:20px 16px}
+ .basic-pathway .basic-pdh-flow{grid-template-columns:1fr;gap:12px}
+ .basic-pathway .basic-connector{transform:rotate(90deg)}
+ .basic-pathway .basic-endpoint>strong{display:inline;margin-left:16px;font-size:23px}
+ .basic-pathway .basic-equation{padding:16px}
+ .basic-pathway .basic-equation p{font-size:16px}
+ .basic-pathway .basic-cycle-center{position:static;transform:none;width:108px;height:108px;margin:0 auto 20px}
+ .basic-pathway .basic-cycle-events{grid-template-columns:1fr;grid-template-areas:'entry' 'carbon' 'carriers' 'regeneration';gap:22px}
+ .basic-pathway .basic-cycle-events>li::after{content:none!important}
+ .basic-pathway .basic-cycle-events>li+li::before{content:'↓';position:absolute;top:-25px;left:calc(50% - 8px);font-size:20px;color:#708c61}
+ .basic-pathway .basic-basis{display:grid;grid-template-columns:1fr 1fr}
+ .basic-pathway .basic-basis button{font-size:13px;padding:8px}
+}
+.respiration-pathway .pathway-heading{display:flex;justify-content:space-between;gap:16px;align-items:baseline;flex-wrap:wrap}
+.respiration-pathway .pathway-heading h3{margin:0;font-size:18px}
+.respiration-pathway .pathway-heading>span{font-size:14px;color:var(--text-3)}
+.respiration-pathway .pathway-filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:18px}
+.respiration-pathway .pathway-filters button,.respiration-pathway .reaction-navigation button{border:1px solid var(--line-strong);background:#fff;border-radius:6px;min-height:44px;padding:8px 16px;font-size:15px}
+.respiration-pathway button[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:700;box-shadow:inset 0 -3px var(--accent)}
+.respiration-pathway .filter-status{min-height:24px;margin:12px 0 16px;font-size:14px;color:#415a47}
+.respiration-pathway .pathway-desktop .science-figure{padding:16px 10px 10px}
+.respiration-pathway .diagram-scroll svg{min-width:940px}
+.respiration-pathway .phase-label{font-size:15px;font-weight:700;letter-spacing:.4px;fill:#48613f}
+.respiration-pathway .phase-divider{stroke:#c2cdbb;stroke-dasharray:4 6}
+.respiration-pathway .metabolite-node rect{fill:#f6f8f0;stroke:#b1c2a8;stroke-width:1.5}
+.respiration-pathway .metabolite-node text{font-size:15px}
+.respiration-pathway .carbon-count{font-size:14px;font-weight:500;fill:#5a7050}
+.respiration-pathway .carbon-highlight rect{fill:#e2edd6;stroke:#436b39;stroke-width:3}
+.respiration-pathway .carbon-highlight .carbon-count{font-weight:800;fill:#254c29}
+.respiration-pathway .enzyme-label{font-size:13px;font-weight:600}
+.respiration-pathway .small-label{font-size:12px;font-weight:500;fill:#53654e}
+.respiration-pathway .energy-event{font-size:13px;font-weight:700;fill:#36674f;color:#36674f}
+.respiration-pathway .redox-event{font-size:13px;font-weight:700;fill:#435f8c;color:#435f8c}
+.respiration-pathway .reaction-halo{fill:transparent;stroke:transparent;pointer-events:none}
+.respiration-pathway .is-highlighted .reaction-halo{fill:#edf2e6;stroke:#d2dec9;stroke-dasharray:4 3}
+.respiration-pathway[data-filter=all] .is-highlighted .reaction-halo{fill:transparent;stroke:transparent}
+.respiration-pathway .reaction-site:not(.is-highlighted) .flow>path{stroke:#929c90;stroke-width:1.5}
+.respiration-pathway .pathway-ledger{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:8px 32px;padding:14px 18px;border-block:1px solid var(--line-strong);margin-top:16px;background:var(--surface);font-size:15px}
+.respiration-pathway .pathway-ledger b{margin-left:6px;font-variant-numeric:tabular-nums}
+.respiration-pathway .pathway-ledger>strong{font-size:18px;color:var(--accent-ink)}
+.respiration-pathway .reaction-explainer{margin:20px 0}
+.respiration-pathway .reaction-navigation{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:13px}
+.respiration-pathway .reaction-navigation>span{margin-right:8px}
+.respiration-pathway .reaction-navigation button{padding:7px 12px;min-width:44px;font-size:13px;font-variant-numeric:tabular-nums}
+.respiration-pathway .reaction-description{border-left:3px solid #7f9c86;margin-top:14px;padding:10px 17px;font-size:15px;min-height:125px}
+.respiration-pathway .reaction-description p{margin:8px 0 0}
+.respiration-pathway .pathway-badge{display:inline-block;border:1px solid #b7c5ad;background:#f0f4e8;border-radius:3px;padding:3px 7px;font-size:12px;line-height:1.6;margin:5px 5px 0 0}
+.respiration-pathway .pathway-badge.irreversible{border-style:dashed}
+.respiration-pathway .pathway-badge.slp{border-bottom:3px double #578069}
+.respiration-pathway .phosphate-inset{padding:20px;border:1px solid #d3ddcc;background:#fffefa}
+.respiration-pathway h4{font-size:15px;margin:0 0 12px}
+.respiration-pathway .phosphate-examples{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.respiration-pathway .phosphate-examples strong{font-size:14px}
+.respiration-pathway .phosphate-examples svg{width:100%;max-width:470px;fill:#33523c;font-size:17px}
+.respiration-pathway .phosphate-examples circle{fill:#e1ebd8;stroke:#578069}
+.respiration-pathway .phosphate-examples .transfer-label{font-size:13px}
+.respiration-pathway .phosphate-inset>p{font-size:14px;margin:18px 0 0}
+.respiration-pathway .pathway-mobile{display:none}
+.respiration-pathway .pathway-scroll-hint{display:none;font-size:13px;color:#50664c}
+@media(min-width:761px) and (max-width:1010px){.respiration-pathway .pathway-scroll-hint{display:block}}
+.respiration-pathway .pdh-equation{padding:20px;background:#edf2e6;border-block:1px solid #c8d5bf;font-size:18px;line-height:1.9;margin:18px 0;overflow-wrap:anywhere}
+.respiration-pathway .pdh-complex{border:1px solid #c7d2bd;background:#fffefa;padding:24px;margin:0}
+.respiration-pathway .pdh-complex figcaption{text-align:center;padding-bottom:20px;border-bottom:1px solid #d7dfcf}
+.respiration-pathway .pdh-complex figcaption strong{display:block;font-size:20px}
+.respiration-pathway .pdh-complex figcaption span{font-size:14px;color:#5e7057}
+.respiration-pathway .pdh-events{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-top:25px}
+.respiration-pathway .pdh-events>div+div{border-left:1px dashed #c1cdb8;padding-left:24px}
+.respiration-pathway .pdh-events svg{width:100%;max-width:340px;font-size:16px;fill:#36513b}
+.respiration-pathway .pdh-events p{font-size:14px;margin:12px 0 0}
+.respiration-pathway .carbon-beads circle{fill:#dce7d3;stroke:#57734d;stroke-width:1.5}
+.respiration-pathway .carbon-beads path,.respiration-pathway .co2-release{fill:none;stroke:#647c55;stroke-width:2}
+.respiration-pathway .redox-line{fill:none;stroke:#4f6b92;stroke-width:2;stroke-dasharray:5 3}
+.respiration-pathway .pathway-caption{font-size:14px;color:#5a6c52;margin:14px 0}
+.respiration-pathway .tca-guide{fill:#f7f8f0;stroke:#d4deca;stroke-dasharray:3 5}
+.respiration-pathway .cycle-title{font-size:25px;letter-spacing:3px;fill:#3b6040}
+.respiration-pathway .oaa-regenerated{font-size:19px;fill:#3e6545}
+.respiration-pathway .carbon-input{font-size:15px}
+.respiration-pathway .carbon-input.active{font-weight:800;text-decoration:underline}
+.respiration-pathway .complex-badge{font-size:13px;fill:#355b48;font-weight:700}
+.respiration-pathway .tca-ledger{justify-content:flex-start}
+.respiration-pathway .sdh-note{border-block:1px solid #cbd7c0;padding:20px;background:#eff3e9;margin:22px 0;font-size:14px}
+.respiration-pathway .sdh-note>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.respiration-pathway .sdh-note p{margin-bottom:12px}
+@media(min-width:761px) and (max-width:900px){
+ .respiration-pathway .pdh-events{grid-template-columns:1fr;gap:20px}
+ .respiration-pathway .pdh-events>div+div{border-left:0;border-top:1px dashed #bdcbb3;padding:20px 0 0}
+ .respiration-pathway .pdh-events svg{max-width:300px}
+}
+@media(max-width:760px){
+ .respiration-pathway .pathway-heading h3{font-size:18px}
+ .respiration-pathway .pathway-desktop{display:none}
+ .respiration-pathway .pathway-mobile{display:block;list-style:none;padding:0;margin:0}
+ .respiration-pathway .mobile-reaction{border-left:2px solid #bdcdb2;border-bottom:1px solid #dde3d6;padding:17px 12px;margin:0;background:#fffefa;overflow-wrap:anywhere}
+ .respiration-pathway .mobile-reaction.is-highlighted{border-left:4px solid #517747;background:#edf2e6}
+ .respiration-pathway .mobile-metabolite{font-weight:650;font-size:16px;padding:7px 9px;background:#f8faf3;border:1px solid #c9d6c0;border-radius:4px}
+ .respiration-pathway .mobile-metabolite b{font-size:14px;color:#547344;padding:0 3px}
+ .respiration-pathway .mobile-metabolite.carbon-highlight{border:2px solid #4d7043;background:#e0ecd3}
+ .respiration-pathway .mobile-metabolite span{display:block;font-size:14px}
+ .respiration-pathway .mobile-enzyme{display:grid;grid-template-columns:20px minmax(0,1fr);gap:7px;padding:14px 3px;font-size:14px;line-height:1.6}
+ .respiration-pathway .mobile-enzyme>span{font-size:25px;color:#527246}
+ .respiration-pathway .mobile-enzyme strong{font-size:14px;overflow-wrap:anywhere}
+ .respiration-pathway .mobile-enzyme p{margin:8px 0 0;font-size:14px}
+ .respiration-pathway .mobile-enzyme .pathway-badge{display:table;max-width:100%}
+ .respiration-pathway .split-note{font-size:14px;margin-bottom:14px;padding:10px;background:#e0e9d6}
+ .respiration-pathway .pathway-filters button{padding:8px 13px}
+ .respiration-pathway .turn-toggle{display:grid;grid-template-columns:1fr}
+ .respiration-pathway .filter-status{min-height:44px;font-size:13px}
+ .respiration-pathway .phosphate-examples{grid-template-columns:1fr;gap:25px}
+ .respiration-pathway .phosphate-inset{padding:15px}
+ .respiration-pathway .phosphate-examples svg{min-width:0;font-size:19px}
+ .respiration-pathway .phosphate-examples .transfer-label{font-size:16px}
+ .respiration-pathway .pathway-ledger{padding:15px;gap:12px 18px}
+ .respiration-pathway .pathway-ledger>span:first-child{flex-basis:100%}
+ .respiration-pathway .reaction-description{min-height:0;padding-inline:13px}
+ .respiration-pathway .pdh-equation{font-size:16px;padding:16px}
+ .respiration-pathway .pdh-complex{padding:16px}
+ .respiration-pathway .pdh-events{grid-template-columns:1fr;gap:20px}
+ .respiration-pathway .pdh-events>div+div{border-left:0;border-top:1px dashed #bdcbb3;padding:20px 0 0}
+ .respiration-pathway .pdh-events svg{max-width:300px}
+}

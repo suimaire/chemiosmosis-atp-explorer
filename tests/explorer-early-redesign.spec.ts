@@ -84,7 +84,7 @@ for (const size of sizes) test(`early redesign interaction and layout ${size.wid
   for (const step of [4,5]) {
     await page.getByRole('button', { name: '다음 단계 →', exact: true }).click()
     await expect(page.locator('.module-title h2')).toHaveText(`0${step} · ${modules[step]}`)
-    await expect(page.locator('.module-title .eyebrow')).toHaveText(`INVESTIGATION / 0${step}`)
+    await expect(page.locator('.module-title .eyebrow')).toHaveText(`단계 0${step} / 05`)
   }
   await expect(page.getByRole('link', { name: '학습 홈으로 →', exact: true })).toBeVisible()
   for (const step of [4,3,2,1,0]) {

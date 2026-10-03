@@ -21,7 +21,7 @@ for (const size of sizes) {
     await page.getByRole('link', { name: /세포호흡부터 보기/ }).click()
     await expect(page).toHaveURL(/#\/respiration$/)
     await noOverflow(page); await shot(page, `${size.width}-respiration`)
-    for (const label of ['02 아세틸-CoA 생성', '03 TCA cycle', '04 전자전달계와 산화적 인산화']) {
+    for (const label of ['02 아세틸-CoA 생성', '03 TCA 회로', '04 전자전달계와 산화적 인산화']) {
       await page.getByRole('button', { name: label, exact: true }).click()
       await expect(page.getByRole('button', { name: label, exact: true })).toHaveAttribute('aria-pressed', 'true')
     }

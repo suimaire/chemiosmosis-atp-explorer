@@ -31,9 +31,7 @@ export function EtcDiagram({ state, fallback }: { state: AnimationState; fallbac
     <text x="22" y="54" className="etc-region-sub">막사이공간 · H⁺ 축적</text>
     <text x="22" y="421" className="etc-region-sub">기질 · Matrix</text>
     {label([-5.25, -0.58, 1.6], '내막', 'etc-membrane-label', 'end')}
-    {complexes.map(c => <g key={c.name}>
-      {label([c.x, c.pump ? -1.38 : -1.27, 0.6], `Complex ${c.name}`, 'etc-complex-label')}
-    </g>)}
+    {complexes.map(c => { const v = project([c.x, c.pump ? -1.38 : -1.27, 0.6]); return <text key={c.name} x={v.x} y={v.y} textAnchor="middle" className="etc-complex-label"><tspan className="etc-complex-prefix">Complex </tspan>{c.name}</text> })}
     {label([-5.55, -2.42, 0.6], 'NADH', 'etc-source', 'start')}
     {label([-2.8, -2.42, 0.6], 'FADH₂*', 'etc-source')}
     {label([-1.8, 0.42, 1.5], 'Q', 'etc-carrier')}

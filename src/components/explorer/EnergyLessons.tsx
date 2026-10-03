@@ -33,16 +33,20 @@ export function GradientLesson({ gradient, setGradient }: { gradient: Gradient; 
       <article className="chemical-card"><span className="concept-kicker">01 · 농도 차</span><h3>화학적 기여</h3><p>H⁺가 많은 쪽에서 적은 쪽으로.</p><small>pH가 낮을수록 H⁺ 농도는 높습니다.</small></article>
       <article className="electrical-card"><span className="concept-kicker">02 · 전위 차</span><h3>전기적 기여</h3><p>양전하를 띤 H⁺는 낮은 전위 쪽으로.</p><small>두 구획의 전위 차가 이동에 기여합니다.</small></article>
     </div>
+    <div className="gradient-stage">
+    <div className="gradient-result">
     <div className="gradient-map" aria-label="두 구획과 H⁺ 이동 방향">
       <div className="gradient-compartment"><b>A 구획</b><span>pH {gradient.pHA.toFixed(1)}</span><div className="proton-dots" aria-hidden="true">{Array.from({ length: Math.round(2 + (10 - gradient.pHA) * 2) }, (_, i) => <i key={i} />)}</div></div>
       <div className="gradient-arrows"><span>농도 차 <b>{tendency(energy.chemical)}</b></span><span>전위 차 <b>{tendency(energy.electrical)}</b></span><strong>{energy.direction === 'equilibrium' ? '순 구동력 없음' : energy.direction === 'A→B' ? '전체 A → B' : '전체 B → A'}</strong><small>전위 차 {gradient.deltaPsiMv} mV</small></div>
       <div className="gradient-compartment"><b>B 구획</b><span>pH {gradient.pHB.toFixed(1)}</span><div className="proton-dots" aria-hidden="true">{Array.from({ length: Math.round(2 + (10 - gradient.pHB) * 2) }, (_, i) => <i key={i} />)}</div></div>
     </div>
     <p className="quiet">점의 개수는 많고 적음만 나타냅니다. 실제 농도비가 아닙니다. 두 기여가 반대 방향이면 합계로 판단합니다.</p>
-    <h3 className="lesson-section-title">직접 바꿔 보세요</h3><GradientControls gradient={gradient} setGradient={setGradient} />
     <h3 className="lesson-section-title">두 기여를 더하면, 전체 기울기의 에너지</h3>
     <div className="metrics" aria-live="polite"><Metric label="화학적 기여" value={energy.chemical} /><Metric label="전기적 기여" value={energy.electrical} /><Metric label="전체 기울기 에너지" value={energy.total} /></div>
     <p className="result-direction" role="status">{energy.direction === 'equilibrium' ? '전기화학적 평형: 어느 방향에도 순 구동력이 없습니다.' : `열역학적으로 유리한 이동 방향: ${energy.direction === 'A→B' ? 'A → B' : 'B → A'}`}</p>
+    </div>
+    <div className="gradient-controls"><h3 className="lesson-section-title">직접 바꿔 보세요</h3><GradientControls gradient={gradient} setGradient={setGradient} /></div>
+    </div>
     <p className="note">표시한 값은 <strong>A → B 이동</strong>의 에너지 변화입니다. ΔG &lt; 0이면 그 방향으로 이동하며 에너지를 내놓을 수 있습니다. ΔG &gt; 0이면 그 방향의 이동에 에너지가 필요합니다.</p>
     <details className="formal-equation"><summary>+ 정식 식으로 정리하기</summary>
       <p>A 구획의 pH = pH<sub>A</sub>, B 구획의 pH = pH<sub>B</sub>. 막 양쪽 전위 차는 <Psi /> = {gradient.deltaPsiMv} mV입니다.</p>
@@ -66,6 +70,8 @@ export function CouplingLesson({ gradient, ratio, requirement, setRatio, setRequ
     <div className="coupling-mode"><p className="step-question">H⁺가 돌아오며 내놓는 에너지로 ATP를 만들 수 있을까요?</p><button className="button" aria-expanded={advanced} aria-controls={advancedId} onClick={() => setAdvanced(!advanced)}>{advanced ? '− 기본으로' : '+ 심화'}</button></div>
     <ol className="coupling-intro"><li>H⁺가 기울기를 따라 이동하면 에너지를 방출합니다.</li><li>여러 H⁺의 이동은 ATP synthase의 회전과 ATP 합성에 연결됩니다.</li></ol>
     <div className="inherited-gradient"><span>01의 조건을 이어받음 · A 구획의 pH {gradient.pHA.toFixed(1)} / B 구획의 pH {gradient.pHB.toFixed(1)} · 막 양쪽 전위 차 {gradient.deltaPsiMv} mV · {gradient.temperatureC} °C</span><button className="button" onClick={onGradient}>기울기 조건 바꾸기</button></div>
+    <div className="coupling-stage">
+    <div className="coupling-main">
     {!advanced && <CouplingVisual sufficient={sufficient} />}
     <div id={advancedId} hidden={!advanced}>
       {advanced && <>
@@ -78,6 +84,8 @@ export function CouplingLesson({ gradient, ratio, requirement, setRatio, setRequ
         {total > 0 && <p className="quiet">A → B 이동에도 {total.toFixed(2)} kJ·mol⁻¹ ATP가 필요하므로, 이 비용까지 더해야 합니다.</p>}
       </>}
     </div>
+    </div>
+    <div className="coupling-aside">
     <h3 className="lesson-section-title">얻는 에너지와 필요한 에너지 비교하기</h3>
     <div className="energy-comparison" role="img" aria-label={advanced ? `H⁺ 이동에서 얻을 수 있는 에너지 ${available.toFixed(2)}, ATP 합성에 필요한 에너지 ${requirement.toFixed(2)} kJ·mol⁻¹ ATP` : `같은 ATP 합성량을 기준으로 비교: H⁺ 이동에서 얻을 수 있는 에너지가 ATP 합성에 필요한 에너지${equilibrium ? '와 같습니다' : sufficient ? '보다 큽니다' : '보다 작습니다'}`}>
       <div><span>H⁺ 이동에서 얻을 수 있는 에너지</span>{advanced && <strong>{available.toFixed(2)}</strong>}<div className="comparison-track"><i style={{ width: `${available / scale * 100}%` }} /></div></div>
@@ -86,6 +94,8 @@ export function CouplingLesson({ gradient, ratio, requirement, setRatio, setRequ
     </div>
     <section className="coupling-result" data-outcome={equilibrium ? 'equilibrium' : sufficient ? 'sufficient' : 'insufficient'} aria-live="polite"><span>결합 결과{advanced && ' · 열역학적으로 유리한가?'}</span><strong>{advanced ? <>ΔG<sub>cycle</sub> = {Math.abs(cycle) < .005 ? '0.00' : cycle.toFixed(2)} <small>kJ·mol⁻¹ ATP</small></> : sufficient ? '충분' : '부족'}</strong><p>{sufficient ? '이 조건에서는 H⁺ 기울기가 ATP 합성을 구동할 만큼 충분합니다.' : '이 조건에서는 H⁺ 기울기만으로 ATP 합성을 구동하기 어렵습니다.'}</p>{equilibrium && <p>두 에너지가 같아 ATP 합성 방향의 순 구동력이 없습니다.</p>}</section>
     {advanced && <p className="note">에너지가 충분해도 실제 합성에는 작동하는 효소와 ADP·무기 인산이 필요하며, 이 계산만으로 ATP 생성 속도를 알 수는 없습니다.</p>}
+    </div>
+    </div>
     <p className="step-bridge">다음에는 막의 조건을 바꾸며 전자전달·H⁺ 기울기·ATP 합성의 관계를 비교합니다.</p>
   </div>
 }
