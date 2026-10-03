@@ -37,7 +37,7 @@ export function Explorer() {
         <div className="lesson-stage">
           <div className="stage-switch"><span className="stage-switch-label">어느 막을 볼까요?</span><div className="context-switch" aria-label="막 문맥"><button aria-pressed={context === 'mito'} onClick={() => setContext('mito')}>미토콘드리아</button><button aria-pressed={context === 'plant'} onClick={() => setContext('plant')}>엽록체 틸라코이드</button></div></div>
           <div className="stage-figure">
-            {context === 'mito' ? <ConceptMembrane paths={paths} /> : <div className="diagram-panel"><Membrane context="plant" {...paths} /></div>}
+            <ConceptMembrane key={context} context={context} paths={paths} />
           </div>
           <div className="stage-side">
             <p className="step-lead">전자전달에서 얻는 에너지로 H⁺를 막 건너편에 모읍니다. H⁺가 ATP 합성효소를 통해 돌아오면, 그 이동이 ATP 합성에 연결됩니다.</p>
@@ -48,6 +48,7 @@ export function Explorer() {
         <p>전자는 운반체 사이에서 전달되고, H⁺는 막을 가로질러 이동합니다. ATP 합성효소를 통한 H⁺의 귀환은 ADP와 무기 인산으로 ATP를 만드는 데 연결됩니다.</p>
         <p className="quiet">모양·입자 수·움직임은 큰 흐름을 보여 주는 교육적 단순화입니다. 실제 분자 구조·농도비·반응 속도를 나타내지 않습니다. H⁺ 기울기에는 농도 차와 전위 차가 모두 포함됩니다.</p>
         {context === 'mito' && <details><summary>+ 심화 · 실제 전자전달계</summary><p>전자전달계의 Complex I·III·IV는 H⁺ 기울기 형성에 기여합니다. Complex II는 H⁺ 펌프가 아닙니다. NADH의 전자는 I에서, succinate 산화로 효소 결합 FAD가 받은 전자는 II에서 들어와 Q로 전달됩니다. III에서 cyt c를 거쳐 IV로 전달된 전자는 최종적으로 O₂를 환원해 물을 만듭니다.</p><p>기본 모형은 I·III·IV의 H⁺ 이동과 NADH 쪽 전자 진입을 묶어 보여 주며 II 진입 경로는 생략합니다. III의 Q cycle과 ATP 합성효소 내부의 회전·촉매 과정도 단순화했습니다. 전자가 자유 입자로 관을 따라 이동한다는 뜻은 아닙니다.</p></details>}
+        {context === 'plant' && <details><summary>+ 심화 · 실제 틸라코이드 전자전달</summary><p>PSII와 PSI는 빛을 흡수해 전자의 에너지를 높입니다. PSII에서 물이 산화되면 O₂와 H⁺가 내강에 생기고, 전자는 PQ → cyt b₆f → PC → PSI → Fd를 거쳐 NADP⁺를 NADPH로 환원합니다.</p><p>기본 모형은 PQ가 스트로마의 H⁺를 받아 내강 쪽에 내놓는 과정을 cyt b₆f를 가로지르는 H⁺ 이동 하나로 묶어 보여 줍니다. NADPH 생성에 쓰이는 스트로마의 H⁺, 순환적 전자 흐름, ATP 합성효소 내부의 회전·촉매 과정은 생략했습니다. 빛은 막의 어느 쪽에서 들어오든 광계에 흡수될 수 있습니다. 그림에서는 사전학습의 광합성 그림과 같이 스트로마 쪽에서 들어오게 그렸을 뿐, 방향에 의미는 없습니다.</p></details>}
         <p className="step-bridge">다음에는 막 양쪽의 농도 차와 전위 차가 왜 에너지가 되는지 확인합니다.</p>
       </>}
       {module === 1 && <GradientLesson gradient={gradient} setGradient={setGradient} />}

@@ -54,9 +54,12 @@
 .concept-overlay .region-note,.concept-overlay .small{font-size:14px;font-weight:500}
 .concept-overlay .membrane-label{font-size:15px;fill:#56684a}
 .concept-overlay .atp-product{font-size:18px;font-weight:700}
+.concept-overlay .complex-name{font-size:15px;fill:#33524e}
 .electron-key,.concept-overlay .electron-text{color:var(--electron);fill:var(--electron)}
 .proton-key,.concept-overlay .proton-text{color:var(--proton);fill:var(--proton)}
 .atp-key{color:var(--atp);fill:var(--atp)}
+.light-key,.concept-overlay .light-text{color:#8a6408;fill:#8a6408}
+.concept-overlay .light-text{font-size:19px}
 .concept-legend{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 14px;padding:10px 14px;font-size:14px;border-top:1px solid var(--line)}
 .concept-status{padding:0 14px 10px;margin:0;font-size:13px;color:var(--text-3)}
 @container(max-width:480px){
@@ -65,6 +68,9 @@
   .concept-overlay .region-note,.concept-overlay .small{font-size:20px}
   .concept-overlay .membrane-label{font-size:22px}
   .concept-overlay .atp-product{font-size:25px}
+  .concept-overlay .complex-name{font-size:21px}
+  .concept-overlay .light-text{font-size:26px}
+  .concept-overlay .membrane-prefix{display:none}
   .concept-legend{font-size:13px;padding:10px 12px}
 }
 

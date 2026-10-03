@@ -49,4 +49,9 @@ describe('electron carrier labels stay in their own membrane', () => {
       for (const text of thylakoidOnly) expect(html).not.toContain(text)
     }
   })
+  it('keeps the thylakoid 3D overlay free of mitochondrial carriers', () => {
+    const html = renderToStaticMarkup(<ConceptMembrane context="plant" paths={{ electrons: true, protons: true, atp: true }} />)
+    expect(html).toContain('cyt b₆f')
+    for (const text of mitochondrialOnly) expect(html).not.toContain(text)
+  })
 })

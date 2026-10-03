@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { Explorer } from './Explorer'
 import { CouplingLesson, GradientLesson } from './components/explorer/EnergyLessons'
 import { ConceptMembrane } from './components/explorer/ConceptMembrane'
+import { lightRays } from './components/explorer/thylakoidLayout'
 import { defaultGradient } from './science'
 
 const noop = () => {}
@@ -23,6 +24,22 @@ describe('early Explorer teaching structure', () => {
     const hidden = renderToStaticMarkup(<ConceptMembrane paths={{ electrons: false, protons: false, atp: false }} />)
     for (const id of ['electron-path','proton-path','atp-path']) expect(hidden).not.toContain(`data-testid="${id}"`)
     expect(visible).not.toContain('Complex I')
+  })
+  it('draws the thylakoid as its own moving model with light, water oxidation and NADPH', () => {
+    const visible = renderToStaticMarkup(<ConceptMembrane context="plant" paths={{ electrons: true, protons: true, atp: true }} />)
+    expect(visible.match(/<canvas/g)).toHaveLength(1)
+    expect(visible).toContain('data-context="plant"')
+    for (const text of ['틸라코이드 내강', '스트로마', 'PSII', 'cyt b₆f', 'PSI', '빛', 'H₂O → O₂', 'NADPH', 'ATP 합성효소']) expect(visible).toContain(text)
+    for (const text of ['막사이공간', '기질', '내막']) expect(visible).not.toContain(text)
+    const hidden = renderToStaticMarkup(<ConceptMembrane context="plant" paths={{ electrons: false, protons: false, atp: false }} />)
+    for (const id of ['electron-path','proton-path','atp-path']) expect(hidden).not.toContain(`data-testid="${id}"`)
+    expect(hidden).not.toContain('빛</text>')
+  })
+  it('brings light in from the stroma side, as in the photosynthesis lesson', () => {
+    for (const [start, end] of lightRays) {
+      expect(start[1]).toBeLessThan(end[1])
+      expect(end[1]).toBeLessThan(0)
+    }
   })
   it('puts concepts before controls and results before the collapsed semantic equation', () => {
     const html = renderToStaticMarkup(<GradientLesson gradient={defaultGradient} setGradient={noop} />)
