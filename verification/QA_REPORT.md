@@ -28,4 +28,20 @@
 
 ## 공개 배포 검증
 
-공식 GitHub 로그인 및 Pages 배포 후 공개 origin에서 동일 시나리오를 실행하고 여기에 결과를 추가한다. 현재 기록은 로컬 production build에 대한 검증이다.
+공개 URL https://suimaire.github.io/chemiosmosis-atp-explorer/ 에서 동일한 6개 시나리오 전부 통과 (4 viewport 학습 동선 + history/저장 차단 + 조회수 모듈 실패 격리). HTML HTTP 200과 자산 로딩을 확인했다. 일반 동선의 console error·pageerror는 0개다.
+
+공개 origin에서도 localStorage에는 요청한 학습 boolean 네 항목만 남았다. 조회수 모듈의 sessionStorage 중복 방지값이 학습 상태와 분리됨을 확인했다. 초기 Pages workflow에서도 Linux Chromium의 6개 시나리오가 통과했다.
+
+`screenshots/live-*` 32장을 추가해 앱 스크린샷은 로컬 32장 + 공개 32장 = 64장이다.
+
+## 포털 통합 검증
+
+- 앱 공개 배포·브라우저 확인 완료 후에만 포털에 새 항목 추가.
+- 원본 네 항목 및 순서 보존, 다섯 번째 항목은 자동 번호 1.2.5.
+- 변경 파일은 `_data/molecular_explorers.yml` 한 개, 11줄 추가.
+- 기존 포털 단위 검사 93/93 통과.
+- 설치되어 있던 Ruby 3.3.12와 실제 Jekyll 3.10.0 `Site#process`로 원격 테마를 포함한 16페이지 빌드 성공. 선택적 개발 서버의 native dependency는 사용하지 않았고 Jekyll·테마 소스를 수정하지 않았다.
+- 로컬 빌드와 공개 포털 각각 1440×900, 390×900에서 기존 항목·번호·링크·가로 넘침 검사 통과.
+- 공개 포털의 새 링크를 클릭해 공개 앱의 첫 화면이 열리는 것을 두 viewport에서 확인. pageerror 0.
+- 증거: `screenshots/portal-live-1440.png`, `screenshots/portal-live-390.png`.
+- 앱과 포털의 workflow·commit은 `docs/DEPLOYMENT.md`에 기록.

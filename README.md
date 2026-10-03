@@ -78,6 +78,6 @@ H⁺ 이동 에너지는 A→B에 대해 `ln(10) RT (pH_A − pH_B) + F(ψ_B −
 
 ## 배포
 
-Vite base는 `/chemiosmosis-atp-explorer/`입니다. GitHub 저장소의 Pages source를 GitHub Actions로 설정한 뒤 `main`을 push합니다. 워크플로는 `npm ci → npm test → npm run build → Pages artifact → deploy`를 실행합니다. hash 기반 화면이므로 Pages에서 새로고침에 서버 라우팅 설정이 필요 없습니다.
+Vite base는 `/chemiosmosis-atp-explorer/`입니다. GitHub 저장소의 Pages source를 GitHub Actions로 설정한 뒤 `main`을 push합니다. 워크플로는 `npm ci → npm test → npm run build → Chromium E2E → Pages artifact → deploy`를 실행합니다. hash 기반 화면이므로 Pages에서 새로고침에 서버 라우팅 설정이 필요 없습니다.
 
 공개 주소에서 자산·라우트·브라우저 테스트를 확인한 다음에만 `suimaire/suimaire.github.io`의 `_data/molecular_explorers.yml`에 링크를 추가합니다. 포털의 미커밋 작업은 수정·stash·reset하지 않습니다. 운영 절차와 최종 상태는 `docs/DEPLOYMENT.md`에 기록합니다.
