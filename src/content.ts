@@ -22,5 +22,6 @@ export const sources = [
   { title: 'Alberts et al. · Electron-Transport Chains and Their Proton Pumps', url: 'https://www.ncbi.nlm.nih.gov/books/NBK26904/' },
   { title: 'Alberts et al. · Chloroplasts and Photosynthesis', url: 'https://www.ncbi.nlm.nih.gov/books/NBK26819/' },
   { title: 'Johnson (2016) · Photosynthesis', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5264509/' },
+  { title: 'Watt et al. (2010) · Bioenergetic cost of making ATP', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC2947889/' },
   { title: 'NIST · CODATA physical constants', url: 'https://physics.nist.gov/cuu/Constants/' },
 ]
