@@ -1,0 +1,47 @@
+.etc-comparison{container-type:inline-size;margin:28px 0 24px;min-width:0}
+.etc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.etc-toolbar .eyebrow{font-size:10px;margin-bottom:5px;letter-spacing:1.5px}
+.etc-toolbar h3{font-size:19px;margin:0}
+.etc-view-controls{display:flex;gap:7px;flex-wrap:wrap}
+.etc-view-controls button{min-height:40px;border:1px solid #b8c9bd;background:#fffefa;padding:8px 10px;border-radius:5px;font-size:11px}
+.etc-view-controls button[aria-pressed=true]{background:#e5eddf;border-color:#558368}
+.etc-view-controls button:disabled{opacity:.45}
+.etc-intro{font-size:13px;color:#526c61;line-height:1.9;margin-bottom:13px}
+.etc-legend{list-style:none;display:flex;flex-wrap:wrap;gap:7px 17px;padding:12px 0;margin:0 0 13px;border-block:1px solid #d9e1d6;font-size:11px;color:#54655e}
+.etc-legend li{display:flex;gap:6px;align-items:center}
+.etc-legend b{font-size:12px;font-weight:700}
+.etc-electron{color:#296e96}.etc-proton{color:#a75b34}.etc-atp{color:#367443}
+.etc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.etc-panel{min-width:0;border:1px solid #cad8ca;background:#fffefa;border-radius:9px;overflow:hidden}
+.etc-panel-b{border-color:#d4c5b6}
+.etc-panel-heading{display:flex;align-items:center;gap:9px;padding:14px 13px;border-bottom:1px solid #e2e7dd;min-height:78px}
+.etc-condition-letter{display:grid;place-items:center;flex:0 0 28px;height:28px;background:#e3eddf;border-radius:50%;font-size:12px;font-weight:750;color:#306848}
+.etc-panel-b .etc-condition-letter{background:#f2e7dc;color:#925d33}
+.etc-panel-heading div>span{font-size:10px;color:#6c7b71}
+.etc-panel-heading h4{font-size:14px;line-height:1.4;margin:2px 0 0;word-break:keep-all}
+.etc-render-label{margin-left:auto;white-space:nowrap;font-size:9px;color:#64786b}
+.etc-scene{position:relative;aspect-ratio:680/450;background:linear-gradient(to bottom,#f8f1e6 0%,#faf6ec 48%,#f0f5eb 52%,#edf3e9 100%);isolation:isolate}
+.etc-scene canvas,.etc-overlay{position:absolute;inset:0;width:100%;height:100%;display:block}
+.etc-canvas-hidden{visibility:hidden}
+.etc-overlay{pointer-events:none}
+.etc-overlay text{fill:#33524e;font-family:inherit;font-size:19px;font-weight:600;paint-order:stroke;stroke:#faf8f0;stroke-width:3px;stroke-linejoin:round}
+.etc-overlay .etc-region{font-size:23px;fill:#96613f;letter-spacing:1px}
+.etc-overlay .etc-region-sub{font-size:18px;fill:#5e7164;font-weight:400}
+.etc-overlay .etc-complex-label{font-size:17px;font-weight:500}
+.etc-overlay .etc-membrane-label{font-size:17px;fill:#647358}
+.etc-overlay .etc-source{font-size:18px;fill:#326f92}
+.etc-overlay .etc-carrier{font-size:16px;fill:#536b7b}
+.etc-overlay .etc-pump-label,.etc-overlay .etc-h-symbol,.etc-overlay .etc-leak-symbol{fill:#a65f32}
+.etc-overlay .etc-atp-label{fill:#377c41;font-size:25px;font-weight:750}
+.etc-overlay .etc-oxygen{fill:#467a88;font-size:19px}
+.etc-scene-caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 10px;padding:10px 13px;font-size:10px;color:#637260;background:#f1f4e9;border-top:1px solid #dce4d4;line-height:1.6}
+.etc-scene-caption strong{font-weight:600;color:#8f5c3a}
+.etc-state-note{font-size:11px;color:#4e6858;line-height:1.8;margin:0;padding:12px 13px;min-height:65px;border-bottom:1px solid #e2e8da}
+.etc-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0;padding:13px}
+.etc-summary dt{font-size:10px;color:#6f7d70;margin-bottom:3px}
+.etc-summary dd{margin:0;font-size:12px;font-weight:650;white-space:nowrap}
+.etc-summary small{font-size:10px;font-variant-numeric:tabular-nums;font-weight:400;margin-left:3px;color:#63786b}
+.etc-footnote,.etc-motion-note{font-size:11px;line-height:1.9;color:#617163;margin:13px 0 0}
+.etc-motion-note{margin:0 0 12px;padding:8px 12px;background:#eaf0e5;border-radius:4px}
+@container(max-width:720px){.etc-grid{grid-template-columns:1fr}.etc-panel-heading{min-height:70px}.etc-state-note{min-height:0}.etc-summary{grid-template-columns:repeat(4,minmax(0,1fr))}.etc-summary dd{white-space:normal}}
+@container(max-width:410px){.etc-toolbar h3{font-size:17px}.etc-summary{grid-template-columns:1fr 1fr}.etc-panel-heading h4{font-size:13px}.etc-legend{gap:8px 14px}.etc-intro{font-size:12px}}
