@@ -58,7 +58,8 @@ main{max-width:1224px;margin:0 auto;padding:0 32px 64px;outline:none}
 .organelle-art{width:100%;height:auto;color:#8f6349}
 .photosynthesis .organelle-art{color:#566e45}
 .organelle-art text[letter-spacing]{display:none}
-.explorer-entry{margin-top:36px}
+.explorer-entry{margin-top:20px}
+.explorer-entry-row h2{margin:0 0 6px;font-size:1.3rem}
 .explorer-entry-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px 24px;align-items:center;padding:24px 12px;border-bottom:1px solid var(--line)}
 .explorer-entry-row p{margin:0;color:var(--text-2);font-size:15px;max-width:640px}
 .storage-note{margin-top:28px}

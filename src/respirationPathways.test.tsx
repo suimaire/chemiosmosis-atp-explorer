@@ -32,8 +32,8 @@ describe('expanded glycolysis: reaction sites and glucose accounting', () => {
   })
   it('renders the phosphate-transfer insets, payoff multiplicity, NADH and water events', () => {
     const html = renderToStaticMarkup(<GlycolysisMap />)
-    for (const text of ['2 NAD⁺ + 2 Pi', '2 NADH + 2 H⁺', '2 H₂O release', '모든 물질·반응 ×2', 'Committed step', 'substrate-level phosphorylation', '1,3-BPG의 인산기가 ADP로 전달', 'PEP의 인산기가 ADP로 전달', '심화 · 해당과정의 조절']) expect(html).toContain(text)
-    expect(html).toContain('반응 중간체의 인산기가 ADP에 직접 전달')
+    for (const text of ['2 NAD⁺ + 2 Pi', '2 NADH + 2 H⁺', '2 H₂O release', '모든 물질과 반응 ×2', 'Committed step', 'substrate-level phosphorylation', '1,3-BPG의 인산기가 ADP로 전달', 'PEP의 인산기가 ADP로 전달', '심화 / 해당과정의 조절']) expect(html).toContain(text)
+    expect(html).toContain('기질의 인산기가 ADP로 직접 전달')
   })
 })
 describe('PDH: coupled oxidative decarboxylation', () => {
@@ -43,7 +43,7 @@ describe('PDH: coupled oxidative decarboxylation', () => {
   })
   it('explains the conceptual decomposition and all five cofactors', () => {
     const html = renderToStaticMarkup(<PyruvateOxidationMap />)
-    for (const text of ['Decarboxylation', 'Acetyl transfer to CoA', 'Cofactor reoxidation', '교육적 분해', 'TPP · lipoamide · CoA · FAD · NAD⁺', 'E1:', 'E2:', 'E3:', '×2 · Glucose 1', 'ATP는 직접 생성하지 않습니다']) expect(html).toContain(text)
+    for (const text of ['Decarboxylation', 'Acetyl transfer to CoA', 'Cofactor reoxidation', '리포아마이드가 반응 중간체를 활성 부위 사이로 운반', 'TPP, 리포아마이드, CoA, FAD, NAD⁺', 'E1은 TPP', 'E2는 아세틸기', 'E3는 환원된', '×2 / Glucose 1', 'ATP는 직접 생성되지 않는다']) expect(html).toContain(text)
   })
 })
 describe('TCA: a closed eight-reaction cycle, with site-specific products', () => {
@@ -63,7 +63,7 @@ describe('TCA: a closed eight-reaction cycle, with site-specific products', () =
     expect(tca.filter(r => r.qh2).map(r => r.id)).toEqual([6])
     expect(tca[4].slp).toBe(true)
     expect(tca[5].complexII).toBe(true)
-    expect(tca[5].note).toContain('H⁺를 펌프하지 않습니다')
+    expect(tca[5].note).toContain('H⁺를 수송하지 않는다')
   })
   it('doubles only the turn balance, never intermediate carbon counts', () => {
     expect(tcaBalance(1)).toEqual({ nadh: 3, co2: 2, qh2: 1, gtp: 1 })
@@ -75,6 +75,6 @@ describe('TCA: a closed eight-reaction cycle, with site-specific products', () =
   })
   it('renders one-turn default, enzyme-bound FAD, membrane site and carbon-fate caveats', () => {
     const html = renderToStaticMarkup(<TcaCycleMap onOpenEtc={() => {}} />)
-    for (const text of ['aria-pressed="true">1 turn', 'FAD-linked reducing equivalent', '효소 결합 FADH₂', '전자가 Q로 전달', 'ETC Complex II', 'inner mitochondrial membrane', 'H⁺ 펌프 작용은 없습니다', 'OAA regenerated', '첫 회전에서 방출되는 CO₂', 'nucleoside diphosphate kinase']) expect(html.toLowerCase()).toContain(text.toLowerCase())
+    for (const text of ['aria-pressed="true">1 turn', 'FAD-linked reducing equivalent', '효소 결합 FADH₂', '전자가 Q로 전달', 'ETC Complex II', '미토콘드리아 내막', '복합체 II는 H⁺를 수송하지 않는다', 'OAA regenerated', '첫 회전에서 방출되는 CO₂', 'nucleoside diphosphate kinase']) expect(html.toLowerCase()).toContain(text.toLowerCase())
   })
 })

@@ -10,7 +10,7 @@ import { normal, relativeState } from './science'
 // Mitochondrial ETC carriers (Q/ubiquinone, cyt c) and thylakoid carriers
 // (PQ/plastoquinone, PC/plastocyanin, Fd/ferredoxin) must never be mixed.
 const mitochondrialOnly = ['ubiquinone', 'cytochrome c', 'cyt c', 'Q = ']
-const thylakoidOnly = ['plastoquinone', 'plastocyanin', 'ferredoxin', 'PQ', 'PC = ', 'PC · ']
+const thylakoidOnly = ['plastoquinone', 'plastocyanin', 'ferredoxin', 'PQ', 'PC = ', 'PC / ']
 const withoutPQ = (html: string) => html.replaceAll('PQ = ', '')
 
 describe('electron carrier labels stay in their own membrane', () => {
@@ -24,14 +24,14 @@ describe('electron carrier labels stay in their own membrane', () => {
   it('labels the mitochondrial inner membrane with Q and cytochrome c only', () => {
     const html = renderToStaticMarkup(<Membrane context="mito" />)
     expect(html).toContain('Q = ubiquinone, cyt c = cytochrome c')
-    expect(html).toContain('cyt c · e⁻')
+    expect(html).toContain('cyt c (e⁻)')
     for (const text of thylakoidOnly) expect(html).not.toContain(text)
   })
   it('labels the thylakoid membrane with PQ and PC, never ubiquinone or cytochrome c', () => {
     const html = renderToStaticMarkup(<Membrane context="plant" />)
     expect(html).toContain('PQ = plastoquinone, PC = plastocyanin')
-    expect(html).toContain('PQ · e⁻')
-    expect(html).toContain('PC · e⁻')
+    expect(html).toContain('PQ (e⁻)')
+    expect(html).toContain('PC (e⁻)')
     for (const text of mitochondrialOnly) expect(withoutPQ(html)).not.toContain(text)
   })
   it('keeps the photosynthesis lesson free of mitochondrial carriers', () => {

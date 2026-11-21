@@ -15,7 +15,7 @@ describe('Step 04 output-to-animation mapping', () => {
     expect(html).toContain('조건 A 3D 개념 모형')
     expect(html).toContain('조건 B 3D 개념 모형')
     expect(html).toContain('data-leak-active="true"')
-    expect(html).toContain('II는 H⁺ 펌프가 아닙니다')
+    expect(html).toContain('복합체 II의 H⁺ 수송 없음')
   })
   it.each(Object.entries(presets))('%s uses the exact shared graph outputs, without per-panel rescaling', (_, preset) => {
     const output = relativeState(preset.condition), state = map(preset.condition)

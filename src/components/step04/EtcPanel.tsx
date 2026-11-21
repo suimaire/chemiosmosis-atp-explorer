@@ -46,16 +46,16 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode }: P
     data-leak-active={state.leakActive} data-leak-rate={state.protonLeakRate}
     data-rotation-speed={state.synthaseRotationSpeed} data-atp-rate={state.atpPulseRate}
     data-density={state.protonDensity} data-motion-intensity={state.motionIntensity} data-particle-budget={state.particleBudget}>
-    <header className="etc-panel-heading"><span className="etc-condition-letter">{name}</span><div><span>조건 {name}</span><h4>{conditionLabel(condition)}</h4></div><span className="etc-render-label">{fallback ? '정적 개념도' : lowDetail || preferences.compact ? '3D · 간소화' : '3D'}</span></header>
-    <div className="etc-scene" role="img" aria-label={`조건 ${name}: 미토콘드리아 내막. I·III·IV에서 H⁺를 위로 펌핑하고, ATP synthase에서 아래로 귀환. II는 펌프 아님.`}>
+    <header className="etc-panel-heading"><span className="etc-condition-letter">{name}</span><div><span>조건 {name}</span><h4>{conditionLabel(condition)}</h4></div><span className="etc-render-label">{fallback ? '정적 개념도' : lowDetail || preferences.compact ? '3D (간략)' : '3D'}</span></header>
+    <div className="etc-scene" role="img" aria-label={`조건 ${name}: 미토콘드리아 내막. 복합체 I, III, IV가 H⁺를 막사이공간으로 수송한다. H⁺는 ATP 합성효소를 통해 기질로 이동한다.`}>
       {!staticMode && <canvas ref={canvas} className={mode === '3d' ? '' : 'etc-canvas-hidden'} aria-hidden="true" />}
       <EtcDiagram state={state} fallback={fallback} />
     </div>
     <div className="etc-scene-caption">
-      <span>↑ H⁺ 펌핑 · I, III, IV</span><span>↓ ATP 합성과 연결된 귀환</span>
-      <strong>{state.leakActive ? '↓ 별도 누출 경로 활성' : 'II는 H⁺ 펌프가 아닙니다'}</strong>
+      <span>↑ H⁺ 수송 (I, III, IV)</span><span>↓ ATP 합성효소를 통한 H⁺ 이동</span>
+      <strong>{state.leakActive ? '↓ H⁺ 누출' : '복합체 II의 H⁺ 수송 없음'}</strong>
     </div>
-    <p className="etc-state-note" role="status">{staticMode ? '정적 보기 · 조건을 바꾸면 그림과 요약도 갱신됩니다.' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중 · 현재 조건의 개념도입니다.' : transition ? '기울기 소실 전환 중 · 아래 수치는 소진 후 정상상태입니다.' : paused ? '움직임 일시정지 · 조건 비교는 계속할 수 있습니다.' : state.inputStopped ? '입력 중단 · 기울기가 소진된 정상상태입니다.' : state.adpLimited ? 'ADP 부족 · H⁺ 기울기를 ATP 합성으로 연결하기 어렵습니다.' : state.synthaseInhibited ? 'ATP 경로 억제 · 기울기가 높아도 회전은 느려집니다.' : state.leakActive ? 'H⁺가 ATP synthase를 우회하여 기질로 돌아갑니다.' : '전자전달 → H⁺ 기울기 → 회전과 ATP 생성'}</p>
+    <p className="etc-state-note" role="status">{staticMode ? '정적 보기' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중' : transition ? '기울기 소실 중 (수치는 소진 후 정상상태)' : paused ? '움직임 일시정지' : state.inputStopped ? '전자전달 중단 후 H⁺ 기울기가 소진된 상태' : state.adpLimited ? 'ADP 부족으로 ATP 합성 속도가 감소한다.' : state.synthaseInhibited ? 'ATP 합성효소를 통한 H⁺ 이동이 억제된다.' : state.leakActive ? 'H⁺가 ATP 합성효소를 우회해 기질로 돌아간다.' : 'H⁺ 유입량과 유출량이 같은 정상상태'}</p>
     <dl className="etc-summary" aria-label={`조건 ${name} 시각화 요약`} aria-live="polite" aria-atomic="true">
       {trends.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{relativeTrend(value)} <small>{value.toFixed(1)}</small></dd></div>)}
     </dl>

@@ -7,7 +7,7 @@ export async function startPageViews() {
   const mount = document.querySelector<HTMLElement>('[data-page-views]')
   if (!mount) return
   if (location.hostname !== 'suimaire.github.io') {
-    mount.textContent = '조회수 · 개발 환경에서는 집계하지 않음'
+    mount.textContent = '조회수 / 개발 환경에서는 집계하지 않음'
     mount.hidden = false
     return
   }

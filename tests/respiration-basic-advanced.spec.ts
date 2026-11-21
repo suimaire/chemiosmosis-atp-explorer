@@ -42,19 +42,19 @@ for (const size of sizes) {
         await expect(detail.getByLabel('해당과정 기본 수지')).toHaveText('ATP 사용 2ATP 생성 4순 ATP 2NADH 2피루브산 2')
       }
       if (step.name === 'pdh') {
-        await expect(detail).toContainText('피루브산 탈수소효소 복합체 안에서 여러 반응이 서로 연결')
+        await expect(detail).toContainText('피루브산 탈수소효소 복합체가 피루브산의 탈탄산과 아세틸-CoA 생성을 촉매')
         await expect(detail.getByLabel('아세틸-CoA 생성 기본 수지')).toContainText('아세틸-CoA 2분자 + CO₂ 2개 + NADH 2개')
       }
       if (step.name === 'tca') {
         await expect(detail.locator('.basic-cycle-events>li')).toHaveCount(4)
         await expect(detail.getByRole('button', { name: '아세틸-CoA 1분자', exact: true })).toHaveAttribute('aria-pressed', 'true')
-        await expect(detail.getByLabel('TCA 기본 산물 수지')).toHaveText('아세틸-CoA 1분자 기준 · 1회전CO₂ 2NADH 3FADH₂ 1ATP 1 상당')
+        await expect(detail.getByLabel('TCA 기본 산물 수지')).toHaveText('아세틸-CoA 1분자 기준 / 1회전CO₂ 2NADH 3FADH₂ 1ATP 1 상당')
         await expect(detail).toContainText('ATP 1개 상당 생성')
       }
       await capture(page, size.width, `${step.name}-basic`)
       if (step.name === 'tca') {
         await detail.getByRole('button', { name: '포도당 1분자', exact: true }).click()
-        await expect(detail.getByLabel('TCA 기본 산물 수지')).toHaveText('포도당 1분자 기준 · 2회전CO₂ 4NADH 6FADH₂ 2ATP 2 상당')
+        await expect(detail.getByLabel('TCA 기본 산물 수지')).toHaveText('포도당 1분자 기준 / 2회전CO₂ 4NADH 6FADH₂ 2ATP 2 상당')
         await capture(page, size.width, 'tca-basic-glucose')
         await detail.getByRole('button', { name: '아세틸-CoA 1분자', exact: true }).click()
       }
@@ -69,9 +69,9 @@ for (const size of sizes) {
         await expect(detail.getByRole('button', { name: '10. Pyruvate kinase', exact: true })).toBeVisible()
       }
       if (step.name === 'pdh') {
-        await expect(detail.locator('.pdh-events h4')).toHaveText(['E1 · Decarboxylation', 'E2 · Acetyl transfer to CoA', 'E3 · Cofactor reoxidation'])
-        await expect(detail.getByText('보조인자: TPP · lipoamide · CoA · FAD · NAD⁺', { exact: true })).toBeVisible()
-        await expect(detail.getByText('NADH는 이 보조인자 재생 과정의 뒤쪽에서 생성됩니다.', { exact: true })).toBeVisible()
+        await expect(detail.locator('.pdh-events h4')).toHaveText(['E1 / Decarboxylation', 'E2 / Acetyl transfer to CoA', 'E3 / Cofactor reoxidation'])
+        await expect(detail.getByText('보조인자: TPP, 리포아마이드, CoA, FAD, NAD⁺', { exact: true })).toBeVisible()
+        await expect(detail.getByText('E3는 환원된 리포아마이드를 재산화한다. 전자는 효소 결합 FAD를 거쳐 NAD⁺로 전달되고 NADH가 생성된다.', { exact: true })).toBeVisible()
       }
       if (step.name === 'tca') {
         await expect(detail.getByRole('group', { name: '반응별 이름과 설명' }).getByRole('button')).toHaveCount(8)
