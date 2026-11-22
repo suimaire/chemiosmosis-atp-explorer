@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import type { AnimationState } from './animationState'
-import { complexes, electronPaths, leakX, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
+import { carrierSites, complexes, electronPaths, leakX, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
 
 export type PathVisibility = { electrons: boolean; protons: boolean; atp: boolean }
 export type SceneController = { update: (state: AnimationState, paused: boolean) => void; setPaths: (paths: PathVisibility) => void; dispose: () => void }
@@ -57,8 +57,8 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     if (c.name === 'II') addMesh(geometry(new THREE.SphereGeometry(0.43, 14, 10)), darkTeal, [c.x, -0.9, 0])
     if (c.pump) addMesh(cylinder(0.46, 0.16), darkTeal, [c.x, 0.7, 0])
   })
-  addMesh(geometry(new THREE.SphereGeometry(0.19, 12, 8)), material(0xd0aa55), [-1.8, 0.1, 1.12])
-  addMesh(geometry(new THREE.SphereGeometry(0.15, 12, 8)), material(0x7e8cc0), [0.45, 1.25, 0.6])
+  addMesh(geometry(new THREE.SphereGeometry(0.19, 12, 8)), material(0xd0aa55), carrierSites.q.position)
+  addMesh(geometry(new THREE.SphereGeometry(0.15, 12, 8)), material(0x7e8cc0), carrierSites.cytC.position)
   addMesh(cylinder(0.36, 0.9), green, [synthaseX, 0, 0])
   addMesh(cylinder(0.1, 1.15), darkTeal, [synthaseX, -0.9, 0])
   const head = addMesh(geometry(new THREE.SphereGeometry(0.58, 20, 12)), green, [synthaseX, -1.7, 0])

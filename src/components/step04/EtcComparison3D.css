@@ -45,6 +45,8 @@
 .etc-overlay .etc-membrane-label{font-size:17px;fill:#647358}
 .etc-overlay .etc-source{font-size:18px;fill:#326f92}
 .etc-overlay .etc-carrier{font-size:16px;fill:#536b7b}
+.etc-reduction-arc{stroke:#744482}
+.etc-overlay .etc-reduction-label{fill:#61376d;font-size:17px;font-weight:700}
 .etc-overlay .etc-pump-label,.etc-overlay .etc-h-symbol,.etc-overlay .etc-leak-symbol{fill:#a65f32}
 .etc-overlay .etc-atp-label{fill:#377c41;font-size:25px;font-weight:750}
 .etc-overlay .etc-oxygen{fill:#467a88;font-size:19px}
@@ -69,6 +71,7 @@
   .etc-overlay .etc-complex-label{font-size:26px}
   .etc-overlay .etc-membrane-label,.etc-overlay .etc-source,.etc-overlay .etc-carrier,.etc-overlay .etc-oxygen{font-size:22px}
   .etc-overlay .etc-atp-label{font-size:30px}
+  .etc-overlay .etc-reduction-label{font-size:20px}
 }
 @container(max-width:420px){
   .etc-summary{grid-template-columns:1fr 1fr}

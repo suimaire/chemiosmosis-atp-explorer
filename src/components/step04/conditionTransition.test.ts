@@ -61,6 +61,38 @@ describe('condition playback and proton balance', () => {
       expect(Math.sign(delta)).toBe(previous === 'leak' ? 1 : -1)
     }
   })
+  it('shows the cyt c shift before the Q shift and retains both after pumping stops', () => {
+    const plan = start('cyanide')
+    expect(plan.frameAt(2).carrierShift).toBeNull()
+    expect(plan.frameAt(2.2).carrierShift?.cytC).toBeGreaterThan(0)
+    expect(plan.frameAt(2.2).carrierShift?.q).toBe(0)
+    const middle = plan.frameAt(3.1).carrierShift!
+    expect(middle.q).toBeGreaterThan(0)
+    expect(middle.cytC).toBeGreaterThan(middle.q)
+    const stopped = plan.frameAt(4.6)
+    expect(stopped.electrons).toBe(0)
+    expect(stopped.carrierShift!.q).toBeGreaterThan(middle.q)
+    expect(plan.frameAt(8).carrierShift).toEqual(stopped.carrierShift)
+    expect(plan.frameAt(3.1).carrierShift).toEqual(middle)
+    expect(plan.frameAt(0).carrierShift).toBeNull()
+    for (const key of keys.filter(k => k !== 'cyanide')) {
+      const reset = makeTransition(stopped, presets[key].condition, 'preset', 'cyanide')
+      expect(reset.frameAt(0).carrierShift).toBeNull()
+      expect(reset.frameAt(reset.duration).carrierShift).toBeNull()
+    }
+  })
+  it('does not build reduced carriers when supply stopped, even with a residual gradient', () => {
+    for (const time of [1, 7]) {
+      const stopped = start('stopped').frameAt(time)
+      expect(stopped.g > 0).toBe(time === 1)
+      const plan = makeTransition(stopped, presets.cyanide.condition, 'preset', 'stopped')
+      for (const stage of plan.stages) {
+        const frame = plan.frameAt(stage.time)
+        expect(frame.carrierShift).toBeNull()
+        expect(frame.electrons).toBe(0)
+      }
+    }
+  })
   it('retargets interrupted terminal blockade and repeated slider input from the displayed rates', () => {
     let current = start('cyanide').frameAt(3.4)
     expect(current.electrons).toBeGreaterThan(0)

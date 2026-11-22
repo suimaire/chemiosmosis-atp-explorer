@@ -1,9 +1,32 @@
 import { useId } from 'react'
 import type { AnimationState } from './animationState'
-import { complexes, electronPaths, leakX, project, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
+import { carrierSites, complexes, electronPaths, leakX, project, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
 
-// The SVG shares the 3D camera projection. In WebGL mode it only adds clear labels;
-// in static mode it also renders the membrane, paths and proteins.
+// The same projected marks sit over the WebGL carriers and the static paths.
+function CarrierSite({ site, shift }: { site: keyof typeof carrierSites; shift: number }) {
+  const carrier = carrierSites[site]
+  const center = project(carrier.position)
+  const anchor = project(carrier.label)
+  const reveal = Math.min(1, shift * 5)
+  const isQ = site === 'q'
+  // Move the original name with its suffix so two labels never cross-fade over each other.
+  const left = anchor.x - (isQ ? 6 : 17)
+  const x = left + ((isQ ? center.x - 45 : center.x + 19) - left) * reveal
+  const y = anchor.y + (center.y - 19 - anchor.y) * reveal
+  return <g className="etc-carrier-site" data-carrier={site}>
+    {shift > 0 && <g transform={`translate(${center.x} ${center.y}) rotate(-90)`} opacity={reveal}>
+      <circle r="12" fill="none" stroke="#eee6ef" strokeWidth="6" />
+      <circle className="etc-reduction-arc" r="12" fill="none" strokeWidth="4.5"
+        pathLength="1" strokeDasharray={`${0.78 * shift} 1`} strokeLinecap="round" />
+    </g>}
+    {shift === 0 ? <text x={anchor.x} y={anchor.y} textAnchor="middle" className="etc-carrier">{carrier.name}</text> :
+      <text x={x} y={y} className="etc-reduction-label" xmlSpace="preserve">
+        {!isQ && <tspan x={x} textAnchor="end" opacity={reveal}>환원형 </tspan>}
+        <tspan x={x}>{carrier.name}</tspan><tspan opacity={reveal}>{isQ ? 'H₂ 증가' : ' 증가'}</tspan>
+      </text>}
+  </g>
+}
+
 export function EtcDiagram({ state, fallback }: { state: AnimationState; fallback: boolean }) {
   const id = useId().replace(/:/g, '')
   const path = (points: readonly Point[]) => points.map((p, i) => { const v = project(p); return `${i ? 'L' : 'M'}${v.x},${v.y}` }).join(' ')
@@ -50,8 +73,8 @@ export function EtcDiagram({ state, fallback }: { state: AnimationState; fallbac
     {(state.inputStopped || state.inputReduced) && label([-3.9, -3.2, 0.6], state.inputStopped ? '전자 공급 중단' : '전자 공급 감소', 'etc-blocked-label')}
     {label([-5.55, -2.42, 0.6], 'NADH', 'etc-source', 'start')}
     {label([-2.8, -2.42, 0.6], '효소 결합 FADH₂', 'etc-source')}
-    {label([-1.8, 0.42, 1.5], 'Q', 'etc-carrier')}
-    {label([0.5, 1.57, 0.6], 'cyt c', 'etc-carrier')}
+    <CarrierSite site="q" shift={state.carrierShift?.q ?? 0} />
+    <CarrierSite site="cytC" shift={state.carrierShift?.cytC ?? 0} />
     {label([1.5, -2.55, 0.6], oxygenStopped ? 'O₂ ↛ H₂O' : 'O₂ → H₂O', 'etc-oxygen')}
     {state.complexIVBlocked && label([1.35, -3.5, 0.6], oxygenStopped ? '산소 소비 중단' : '복합체 IV 억제 중', 'etc-blocked-label')}
     {hasReturn && label([synthaseX, -2.55, 0.6], 'ATP', 'etc-atp-label')}

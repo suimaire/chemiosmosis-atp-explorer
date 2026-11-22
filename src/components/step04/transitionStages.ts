@@ -56,7 +56,7 @@ const stages: Record<TransitionKey, readonly Stage[]> = {
   ],
 }
 
-export function stagesFor(key: TransitionKey, previous?: PresetKey, depleted = false): readonly Stage[] {
+export function stagesFor(key: TransitionKey, previous: PresetKey | undefined, depleted: boolean, upstreamAvailable: boolean): readonly Stage[] {
   if (key === 'cyanide' && depleted) {
     const notes = [
       '직전 조건에서 산소 소비와 H⁺ 기울기가 이미 0이다.',
@@ -68,8 +68,12 @@ export function stagesFor(key: TransitionKey, previous?: PresetKey, depleted = f
     ]
     return cyanideStages.map((stage, i) => ({ ...stage, note: notes[i] ?? stage.note }))
   }
-  if (key === 'cyanide' && previous !== 'normal')
-    return [{ ...cyanideStages[0], note: '직전 조건의 전자전달 속도와 H⁺ 기울기에서 시안화합물 처리를 시작한다.' }, ...cyanideStages.slice(1)]
+  if (key === 'cyanide' && (previous !== 'normal' || !upstreamAvailable))
+    return cyanideStages.map((stage, i) => {
+      if (i === 0) return { ...stage, note: '직전 조건의 전자전달 속도와 H⁺ 기울기에서 시안화합물 처리를 시작한다.' }
+      if (i === 3 && !upstreamAvailable) return { ...stage, note: '상류 전자전달이 이미 멈춰 운반체에 새 전자가 공급되지 않는다.' }
+      return stage
+    })
   if (key !== 'normal') return stages[key]
   const reset = previous === 'leak' ? '누출 전도도를 정상값으로 낮추면 같은 기울기에서 우회 귀환량이 감소한다.' :
     previous === 'inhibited' ? 'ATP 합성 경로의 활성을 정상값으로 높이면 남아 있는 기울기가 H⁺ 귀환과 ATP 합성을 구동한다.' :

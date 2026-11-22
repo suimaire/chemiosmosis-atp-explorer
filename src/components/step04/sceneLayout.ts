@@ -8,14 +8,18 @@ export const complexes = [
 ] as const
 export const synthaseX = 4.05
 export const leakX = 5.8
+export const carrierSites = {
+  q: { position: [-1.8, 0.1, 1.12], label: [-1.8, 0.42, 1.5], name: 'Q' },
+  cytC: { position: [0.45, 1.25, 0.6], label: [0.5, 1.57, 0.6], name: 'cyt c' },
+} as const
 export function project([x, y, z]: Point) {
   return { x: (x + 6.8) * 50, y: 225 - (12 * y - 5 * z) / 13 * 50 }
 }
 // Separate cyt c → IV → O₂ from electron transfers upstream of cyt c.
-export const terminalElectronPath: Point[] = [[0.45, 1.25, 0.6], [1.45, 1.25, 0.6], [1.45, -0.9, 0.6], [2.15, -1.9, 0.6]]
+export const terminalElectronPath: Point[] = [carrierSites.cytC.position, [1.45, 1.25, 0.6], [1.45, -0.9, 0.6], [2.15, -1.9, 0.6]]
 export const electronPaths: Point[][] = [
-  [[-5.65, -2.05, 0.6], [-4.7, -0.75, 0.6], [-4.7, 0.1, 1.12], [-1.8, 0.1, 1.12]],
-  [[-2.8, -2.05, 0.6], [-2.8, -0.4, 1.12], [-1.8, 0.1, 1.12]],
-  [[-1.8, 0.1, 1.12], [-0.7, 0.1, 1.12], [-0.7, 1.25, 0.6], [0.45, 1.25, 0.6]],
+  [[-5.65, -2.05, 0.6], [-4.7, -0.75, 0.6], [-4.7, 0.1, 1.12], carrierSites.q.position],
+  [[-2.8, -2.05, 0.6], [-2.8, -0.4, 1.12], carrierSites.q.position],
+  [carrierSites.q.position, [-0.7, 0.1, 1.12], [-0.7, 1.25, 0.6], carrierSites.cytC.position],
   terminalElectronPath,
 ]

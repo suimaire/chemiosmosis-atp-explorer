@@ -1,6 +1,7 @@
 import { normal, relativeState, steadyState, type Condition } from '../../science'
 
 import type { ConditionFrame } from './conditionTransition'
+import { cyanideCarrierShift, cyanideDuration } from './cyanideTransition'
 
 export type AnimationState = {
   electronFlowSpeed: number
@@ -12,6 +13,7 @@ export type AnimationState = {
   oxygenRate: number
   leakActive: boolean
   complexIVBlocked: boolean
+  carrierShift: ConditionFrame['carrierShift']
   inputStopped: boolean
   inputReduced?: boolean
   adpLimited: boolean
@@ -36,6 +38,8 @@ export function mapAnimationState(condition: Condition, output: ReturnType<typeo
     protonLeakRate: frame?.leakRate ?? condition.leak * flux.gradient / reference.oxygen,
     leakActive: controls.leak > normal.leak + 0.000001,
     complexIVBlocked: frame?.terminalBlock ?? (condition.complexIVActivity === 0),
+    carrierShift: frame ? frame.carrierShift :
+      condition.complexIVActivity === 0 && condition.input > 0 ? cyanideCarrierShift(cyanideDuration) : null,
     inputStopped: controls.input === 0,
     inputReduced: controls.input > 0 && controls.input < 0.999999,
     adpLimited: controls.adp < 0.5,
