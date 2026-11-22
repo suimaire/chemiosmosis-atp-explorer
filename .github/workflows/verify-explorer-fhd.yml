@@ -1,16 +1,18 @@
-name: Verify explorer FHD layout
+name: Verify deployed explorer in Chromium
 on:
   push:
     branches: [qa/explorer-fhd-pr-3]
 permissions:
   contents: read
 jobs:
-  layout:
+  published-page:
     runs-on: ubuntu-latest
+    timeout-minutes: 16
+    env:
+      VERIFIED_CSS: index-BdkYtqzU.css
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -18,61 +20,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Install Korean fonts
-        run: sudo apt-get install -y fonts-noto-cjk python3-pil
-      - name: Build both revisions
+      - run: sudo apt-get install -y fonts-noto-cjk
+      - name: Wait for the verified stylesheet on the public Pages entry point
         run: |
-          git worktree add --detach "$RUNNER_TEMP/baseline" b2e72e871a4608db9e9cd5e4550428149c8f1bf4
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/baseline/node_modules"
-          (cd "$RUNNER_TEMP/baseline" && npm run build)
-          npm run build
-      - name: Measure the first viewport and capture both revisions
-        env:
-          BASELINE_URL: http://127.0.0.1:42864/chemiosmosis-atp-explorer/
-          CANDIDATE_URL: http://127.0.0.1:42865/chemiosmosis-atp-explorer/
-        run: |
-          (cd "$RUNNER_TEMP/baseline" && npm run preview -- --host 127.0.0.1 --port 42864 --strictPort) &
-          npm run preview -- --host 127.0.0.1 --port 42865 --strictPort &
-          for url in "$BASELINE_URL" "$CANDIDATE_URL"; do curl --retry 20 --retry-delay 1 --retry-connrefused -fsS "$url" -o /dev/null; done
-          node .github/qa/measure-layout.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: explorer-layout-screenshots
-          path: verification/fhd-layout/
-          retention-days: 14
-      - name: Render first-viewport thumbnails for review
-        if: ${{ !cancelled() }}
-        run: |
-          /usr/bin/python3 - <<'PY'
-          from pathlib import Path
-          from PIL import Image
-          from io import BytesIO
-          from base64 import b64encode
-          root = Path("verification/fhd-layout")
-          for name in ["before-1920", "after-1920", "after-1536", "after-1440", "after-1024", "after-768", "after-390"]:
-              if not (root / (name + ".png")).is_file(): continue
-              im = Image.open(root / (name + ".png")).convert("RGB")
-              im.thumbnail((1040, 720))
-              out = BytesIO()
-              im.save(out, format="WEBP", quality=76)
-              data = b64encode(out.getvalue()).decode()
-              for i in range(0, len(data), 3000):
-                  print(f"FHD_IMAGE {name} {i:07d} {data[i:i+3000]}")
-          PY
-  suite:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: fc19db8b4e6dcd6d928421ada4d1b5bfa7e12b14
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+          for attempt in $(seq 1 55); do
+            if curl -fsSL -H 'Cache-Control: no-cache' https://suimaire.github.io/chemiosmosis-atp-explorer/ | grep -Fq "$VERIFIED_CSS"; then exit 0; fi
+            sleep 12
+          done
+          exit 1
+      - name: Check both diagrams, four readings, playback, preset and static mode on Pages
+        run: node .github/qa/check-live.mjs
