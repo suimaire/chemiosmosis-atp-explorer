@@ -71,6 +71,10 @@ try {
     const row = { width, height, before: simplify(before), after: simplify(after) }
     console.log('FHD_MEASUREMENT ' + JSON.stringify(row))
     rows.push(row)
+    if (width === 1536) {
+      const scene = after.columns[0].scene
+      assert(scene.y + scene.height * 0.7 <= height, 'the membrane and complex labels should fit at display scaling')
+    }
     if (width === 1920) {
       assert(after.columns[0].card.width > before.columns[0].card.width * 1.35)
       assert(after.columns[0].scene.width > before.columns[0].scene.width * 1.15)
