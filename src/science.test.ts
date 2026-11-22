@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coupledEnergy, defaultGradient, F, normal, presets, protonEnergy, relativeState, steadyState } from './science'
+import { coupledEnergy, defaultGradient, F, normal, presetOf, presets, protonEnergy, relativeState, steadyState } from './science'
 
 describe('proton electrochemical energy, A → B', () => {
   it('zero gradient has zero energy and no preferred direction', () => {
@@ -63,6 +63,17 @@ describe('limited steady-state teaching model', () => {
   })
   it('input suppression lowers all indicators', () => { for (const v of Object.values(relativeState(presets.reduced.condition))) expect(v).toBeLessThan(100) })
   it('stopped input has zero steady-state gradient, oxygen and ATP', () => expect(steadyState(presets.stopped.condition)).toEqual({ gradient: 0, oxygen: 0, atp: 0 }))
+  it('terminal blockade preserves donor supply and synthase activity while stopping respiration', () => {
+    const blocked = presets.cyanide.condition
+    expect(blocked).toEqual({ ...normal, complexIVBlocked: true })
+    expect(presetOf(blocked)).toBe('cyanide')
+    expect(presetOf({ ...blocked, input: 0.25 })).toBe('custom')
+    expect(presetOf({ ...normal, complexIVBlocked: false })).toBe('normal')
+    expect(presetOf(presets.stopped.condition)).toBe('stopped')
+    expect(relativeState(blocked)).toEqual({ oxygen: 0, gradient: 0, atp: 0 })
+    expect(relativeState({ ...blocked, input: 0.25 })).toEqual(relativeState(presets.stopped.condition))
+    expect(() => steadyState({ ...blocked, leak: 0, synthase: 0 })).toThrow(RangeError)
+  })
   it('zero ADP prevents oxidative ATP synthesis', () => expect(steadyState({ ...normal, adp: 0 }).atp).toBe(0))
   it('zero synthase activity prevents oxidative ATP synthesis', () => expect(steadyState({ ...normal, synthase: 0 }).atp).toBe(0))
   it('steady state balances pumping with proton return for all presets', () => {

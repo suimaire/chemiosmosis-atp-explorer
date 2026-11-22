@@ -47,6 +47,7 @@
 .etc-overlay .etc-carrier{font-size:16px;fill:#536b7b}
 .etc-overlay .etc-pump-label,.etc-overlay .etc-h-symbol,.etc-overlay .etc-leak-symbol{fill:#a65f32}
 .etc-overlay .etc-atp-label{fill:#377c41;font-size:25px;font-weight:750}
+.etc-overlay .etc-block-label{fill:#933f28;font-weight:700}
 .etc-overlay .etc-oxygen{fill:#467a88;font-size:19px}
 .etc-scene-caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:8px 12px;font-size:13px;color:var(--text-2);background:var(--surface);border-top:1px solid var(--line);line-height:1.55}
 .etc-scene-caption strong{font-weight:600;color:#8f5c3a}

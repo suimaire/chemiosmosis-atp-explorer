@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { relativeState, type Condition } from '../../science'
+import { presets, relativeState, type Condition } from '../../science'
 import { conditionLabel, mapAnimationState, relativeTrend, type DisplayPreferences } from './animationState'
 import { EtcDiagram } from './EtcDiagram'
 import type { SceneController } from './EtcScene'
@@ -37,6 +37,9 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode }: P
   }, [staticMode])
 
   const fallback = staticMode || mode !== '3d'
+  const cause = state.complexIVBlocked ? presets.cyanide.description : state.inputStopped
+    ? 'NADH와 효소 결합 FADH₂에서 전자전달계로 들어오는 전자 공급이 끊겨 O₂로 전달될 전자가 없다. 기존 H⁺ 기울기가 소실되면 산화적 ATP 합성도 멈춘다.'
+    : ''
   const trends = [
     ['전자전달', output.oxygen], ['H⁺ 기울기', output.gradient], ['ATP 합성', output.atp], ['산소 소비', output.oxygen],
   ] as const
@@ -47,17 +50,19 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode }: P
     data-rotation-speed={state.synthaseRotationSpeed} data-atp-rate={state.atpPulseRate}
     data-density={state.protonDensity} data-motion-intensity={state.motionIntensity} data-particle-budget={state.particleBudget}>
     <header className="etc-panel-heading"><span className="etc-condition-letter">{name}</span><div><span>조건 {name}</span><h4>{conditionLabel(condition)}</h4></div><span className="etc-render-label">{fallback ? '정적 개념도' : lowDetail || preferences.compact ? '3D (간략)' : '3D'}</span></header>
-    <div className="etc-scene" role="img" aria-label={`조건 ${name}: 미토콘드리아 내막. 복합체 I, III, IV가 H⁺를 막사이공간으로 수송한다. H⁺는 ATP 합성효소를 통해 기질로 이동한다.`}>
+    <div className="etc-scene" role="img" aria-label={`조건 ${name}: 미토콘드리아 내막. ${state.complexIVBlocked ? '복합체 IV 억제. O₂ 환원과 H⁺ 수송 중단.' : state.inputStopped ? '전자 공급 중단. O₂ 환원과 H⁺ 수송 중단.' : '복합체 I, III, IV의 H⁺ 수송 경로와 ATP 합성효소를 통한 H⁺ 귀환 경로.'}`}>
       {!staticMode && <canvas ref={canvas} className={mode === '3d' ? '' : 'etc-canvas-hidden'} aria-hidden="true" />}
       <EtcDiagram state={state} fallback={fallback} />
     </div>
     <div className="etc-scene-caption">
-      <span>↑ H⁺ 수송 (I, III, IV)</span><span>↓ ATP 합성효소를 통한 H⁺ 이동</span>
-      <strong>{state.leakActive ? '↓ H⁺ 누출' : '복합체 II의 H⁺ 수송 없음'}</strong>
+      {cause ? <span>{cause}</span> : <>
+        <span>↑ H⁺ 수송 (I, III, IV)</span><span>↓ ATP 합성효소를 통한 H⁺ 이동</span>
+        <strong>{state.leakActive ? '↓ H⁺ 누출' : '복합체 II의 H⁺ 수송 없음'}</strong>
+      </>}
     </div>
-    <p className="etc-state-note" role="status">{staticMode ? '정적 보기' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중' : transition ? '기울기 소실 중 (수치는 소진 후 정상상태)' : paused ? '움직임 일시정지' : state.inputStopped ? '전자전달 중단 후 H⁺ 기울기가 소진된 상태' : state.adpLimited ? 'ADP 부족으로 ATP 합성 속도가 감소한다.' : state.synthaseInhibited ? 'ATP 합성효소를 통한 H⁺ 이동이 억제된다.' : state.leakActive ? 'H⁺가 ATP 합성효소를 우회해 기질로 돌아간다.' : 'H⁺ 유입량과 유출량이 같은 정상상태'}</p>
+    <p className="etc-state-note" role="status">{staticMode ? '정적 보기' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중' : transition ? '기울기 소실 중 (수치는 소진 후 정상상태)' : paused ? '움직임 일시정지' : state.complexIVBlocked ? '복합체 IV 억제 후 정상상태' : state.inputStopped ? '전자전달 중단 후 H⁺ 기울기가 소진된 상태' : state.adpLimited ? 'ADP 부족으로 ATP 합성 속도가 감소한다.' : state.synthaseInhibited ? 'ATP 합성효소를 통한 H⁺ 이동이 억제된다.' : state.leakActive ? 'H⁺가 ATP 합성효소를 우회해 기질로 돌아간다.' : 'H⁺ 유입량과 유출량이 같은 정상상태'}</p>
     <dl className="etc-summary" aria-label={`조건 ${name} 시각화 요약`} aria-live="polite" aria-atomic="true">
-      {trends.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{relativeTrend(value)} <small>{value.toFixed(1)}</small></dd></div>)}
+      {trends.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{label === 'H⁺ 기울기' && value === 0 ? '소실' : relativeTrend(value)} <small>{value.toFixed(1)}</small></dd></div>)}
     </dl>
   </section>
 }

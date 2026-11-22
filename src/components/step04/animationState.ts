@@ -1,4 +1,4 @@
-import { normal, presets, relativeState, steadyState, type Condition } from '../../science'
+import { normal, presetOf, presets, relativeState, steadyState, type Condition } from '../../science'
 
 export type AnimationState = {
   electronFlowSpeed: number
@@ -10,6 +10,7 @@ export type AnimationState = {
   oxygenRate: number
   leakActive: boolean
   inputStopped: boolean
+  complexIVBlocked: boolean
   adpLimited: boolean
   synthaseInhibited: boolean
   motionIntensity: number
@@ -30,6 +31,7 @@ export function mapAnimationState(condition: Condition, output: ReturnType<typeo
     protonLeakRate: condition.leak * flux.gradient / reference.oxygen,
     leakActive: condition.leak > normal.leak,
     inputStopped: condition.input === 0,
+    complexIVBlocked: condition.complexIVBlocked === true,
     adpLimited: condition.adp < 0.5,
     synthaseInhibited: condition.synthase < 0.2,
     motionIntensity: preferences.reducedMotion ? 0.2 : 1,
@@ -37,7 +39,8 @@ export function mapAnimationState(condition: Condition, output: ReturnType<typeo
   }
 }
 export function conditionLabel(condition: Condition) {
-  return Object.values(presets).find(p => Object.entries(p.condition).every(([key, value]) => condition[key as keyof Condition] === value))?.label ?? '사용자 조절 조건'
+  const key = presetOf(condition)
+  return key === 'custom' ? '사용자 조절 조건' : presets[key].label
 }
 export function relativeTrend(value: number) {
   return value < 0.01 ? '정지' : Math.abs(value - 100) < 0.05 ? '정상 수준' : value > 100 ? '증가 ↑' : '감소 ↓'

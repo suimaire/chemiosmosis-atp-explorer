@@ -4,7 +4,7 @@ import { Membrane, compartments } from './components/Membrane'
 import { EtcComparison3D } from './components/step04/EtcComparison3D'
 import { ConceptMembrane } from './components/explorer/ConceptMembrane'
 import { CouplingLesson, GradientLesson, Range } from './components/explorer/EnergyLessons'
-import { defaultGradient, normal, presets, relativeState, type Condition, type Gradient, type PresetKey } from './science'
+import { defaultGradient, normal, presetOf, presets, relativeState, type Condition, type Gradient, type PresetKey } from './science'
 import './components/explorer/EarlyExplorer.css'
 
 const explorerModules = ['전자전달계와 H⁺ 기울기 형성', 'H⁺ 이동의 자유에너지', 'ATP 합성의 에너지 조건', '미토콘드리아 조건 비교', '산소 소비와 ATP 합성 자료 해석', '틸라코이드의 화학삼투']
@@ -56,7 +56,7 @@ export function Explorer() {
           B: { preset: <PresetPicker name="B" value={b} setValue={setB} />, adjust: <ConditionControls name="B" value={b} setValue={setB} /> },
         }} />
         <section className="results-block" aria-labelledby="ab-results-title"><h3 id="ab-results-title" className="lesson-section-title">정상상태의 산소 소비, H⁺ 기울기, ATP 합성</h3><p className="note">산소와 호흡 기질의 공급이 충분할 때, H⁺ 기울기가 커지면 H⁺를 더 수송하는 데 필요한 일이 증가해 전자전달이 느려진다.</p><Results a={a} b={b} /></section>
-        <p className="quiet">입력을 중단한 조건의 값은 기존 기울기가 소진된 후의 정상상태에 해당한다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = input × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = input / (input + leak + 0.75 × ADP × synthase)이다.</p><p>input은 전자전달 입력, leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
+        <p className="quiet">전자 공급 중단과 복합체 IV 억제 조건의 수치는 기존 H⁺ 기울기가 소실된 후의 값이다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = C × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = C / (C + leak + 0.75 × ADP × synthase)이다.</p><p>C는 전자전달 용량이다. 복합체 IV가 작동하면 C는 전자전달 입력값과 같고, 완전히 억제되면 입력값에 관계없이 C = 0이다. leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
       </>}
       {module === 4 && <Inference />}
       {module === 5 && <><p className="step-lead">두 막에서 ATP 합성효소의 촉매 부위는 어느 쪽을 향하며, H⁺는 어느 방향으로 이동하는가?</p><div className="diagram-panel"><Membrane context="plant" /></div><Bridge /><Quiz questions={[
@@ -67,9 +67,6 @@ export function Explorer() {
       <div className="module-next"><button className="button" disabled={module === 0} onClick={() => setModule(module - 1)}>← 이전</button>{module < 5 ? <button className="button primary" onClick={() => setModule(module + 1)}>다음 단계 →</button> : <a className="button primary" href="#/">학습 홈으로 →</a>}</div>
     </section></div>
   </>
-}
-function presetOf(value: Condition) {
-  return (Object.keys(presets) as PresetKey[]).find(k => Object.entries(presets[k].condition).every(([key, v]) => value[key as keyof Condition] === v)) || 'custom'
 }
 function PresetPicker({ name, value, setValue }: { name: string; value: Condition; setValue: (v: Condition) => void }) {
   return <label className="preset-picker"><span><b className={`preset-letter preset-letter-${name.toLowerCase()}`}>{name}</b> 처리 조건</span><select aria-label={`조건 ${name} 처리`} value={presetOf(value)} onChange={e => setValue({ ...presets[e.target.value as PresetKey].condition })}><option value="custom" disabled>사용자 조절 조건</option>{Object.entries(presets).map(([key, p]) => <option key={key} value={key}>{p.label}</option>)}</select></label>

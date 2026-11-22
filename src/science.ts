@@ -14,7 +14,7 @@ export function coupledEnergy(protonDeltaG: number, ratio: number, atpRequiremen
   if (![protonDeltaG, ratio, atpRequirement].every(Number.isFinite) || ratio <= 0 || atpRequirement < 0) throw new RangeError('Invalid coupling parameters')
   return ratio * protonDeltaG + atpRequirement
 }
-export type Condition = { input: number; synthase: number; leak: number; adp: number }
+export type Condition = { input: number; synthase: number; leak: number; adp: number; complexIVBlocked?: boolean }
 export const normal: Condition = { input: 1, synthase: 1, leak: 0.12, adp: 1 }
 export const presets = {
   normal: { label: '정상 결합 상태', condition: normal },
@@ -22,18 +22,31 @@ export const presets = {
   leak: { label: 'H⁺ 누출 증가', condition: { ...normal, leak: 1.2 } },
   reduced: { label: '전자전달 입력 감소', condition: { ...normal, input: 0.25 } },
   stopped: { label: '전자전달 입력 중단', condition: { ...normal, input: 0 } },
+  cyanide: {
+    label: '시안화합물 처리',
+    condition: { ...normal, complexIVBlocked: true },
+    description: '시안화합물이 복합체 IV(시토크롬 c 산화효소)를 억제하면 최종 전자수용체인 O₂가 물로 환원되지 않아 산소 소비가 중단된다. 전자전달계의 순 전자 흐름과 복합체 I, III, IV의 H⁺ 수송도 멈춘다. 기존 기울기를 따라 H⁺가 누출 경로와 ATP 합성효소를 통해 기질로 돌아가면 기울기가 소실되어 산화적 ATP 합성도 멈춘다.',
+  },
   adp: { label: 'ADP 가용성 감소', condition: { ...normal, adp: 0.15 } },
 }
 export type PresetKey = keyof typeof presets
+export function presetOf(value: Condition): PresetKey | 'custom' {
+  return (Object.keys(presets) as PresetKey[]).find(key => {
+    const c: Condition = presets[key].condition
+    return c.input === value.input && c.synthase === value.synthase && c.adp === value.adp &&
+      c.leak === value.leak && (c.complexIVBlocked ?? false) === (value.complexIVBlocked ?? false)
+  }) ?? 'custom'
+}
 export function steadyState(c: Condition) {
-  if (!Object.values(c).every(v => Number.isFinite(v) && v >= 0) || c.input > 1 || c.synthase > 1 || c.adp > 1 || c.leak > 2) throw new RangeError('Condition outside teaching model domain')
+  if ((c.complexIVBlocked !== undefined && typeof c.complexIVBlocked !== 'boolean') || ![c.input, c.synthase, c.leak, c.adp].every(v => Number.isFinite(v) && v >= 0) || c.input > 1 || c.synthase > 1 || c.adp > 1 || c.leak > 2) throw new RangeError('Condition outside teaching model domain')
   const conductance = 0.75 * c.adp * c.synthase
-  const denominator = c.input + c.leak + conductance
+  const capacity = c.complexIVBlocked ? 0 : c.input
+  const denominator = capacity + c.leak + conductance
   if (denominator === 0) throw new RangeError('No unique steady state in a closed, unpowered membrane')
-  // Teaching balance: input*(1-g) = (leak + synthase conductance)*g.
+  // Teaching balance: capacity*(1-g) = (leak + synthase conductance)*g.
   // Oxygen is proportional to mitochondrial electron flux; ATP to synthase flux.
-  const gradient = c.input / denominator
-  return { gradient, oxygen: c.input * (1 - gradient), atp: conductance * gradient }
+  const gradient = capacity / denominator
+  return { gradient, oxygen: capacity * (1 - gradient), atp: conductance * gradient }
 }
 export function relativeState(c: Condition) {
   const result = steadyState(c), reference = steadyState(normal)

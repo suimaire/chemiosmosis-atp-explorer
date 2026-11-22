@@ -159,9 +159,10 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     // Visibility is a teaching aid only. It never changes flux or thermodynamics.
     electronLines.forEach(m => { m.visible = paths.electrons })
     electrons.flat().forEach(m => { m.visible = m.visible && paths.electrons })
-    ;[...pumpLines, ...pumpArrows, cloud].forEach(m => { m.visible = paths.protons })
+    ;[...pumpLines, ...pumpArrows].forEach(m => { m.visible = paths.protons && s.protonPumpRate > 0 })
+    cloud.visible = paths.protons
     pumps.flat().forEach(m => { m.visible = m.visible && paths.protons })
-    returnLine.visible = returnArrow.visible = paths.atp
+    returnLine.visible = returnArrow.visible = paths.atp && s.synthaseRotationSpeed > 0
     rotor.visible = paths.atp
     returns.forEach(m => { m.visible = m.visible && paths.atp })
     atps.forEach(m => { m.visible = m.visible && paths.atp })
@@ -221,7 +222,7 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     setPaths(nextPaths) { paths = nextPaths; if (!disposed) { try { render(0) } catch { fail() } } },
     update(state, isPaused) {
       const changed = state !== target
-      if (changed && state.inputStopped && !target.inputStopped && state.motionIntensity === 1 && !isPaused && inView) {
+      if (changed && state.protonPumpRate === 0 && target.protonPumpRate > 0 && (state.inputStopped || state.complexIVBlocked) && state.motionIntensity === 1 && !isPaused && inView) {
         previous = displayed; elapsed = 0; callbacks.onTransition(true)
       } else if (changed || isPaused) { elapsed = STOP_TRANSITION_SECONDS; callbacks.onTransition(false) }
       target = state; paused = isPaused

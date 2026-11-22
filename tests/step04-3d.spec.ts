@@ -18,7 +18,7 @@ async function noOverflow(page: Page) {
 }
 
 for (const size of sizes) {
-  test(`Step 04 six conditions and graph consistency ${size.width}x${size.height}`, async ({ page }) => {
+  test(`Step 04 preset conditions and graph consistency ${size.width}x${size.height}`, async ({ page }) => {
     const errors: string[] = []
     page.on('pageerror', e => errors.push(e.message))
     page.on('console', e => { if (e.type() === 'error') errors.push(e.text()) })
@@ -46,6 +46,11 @@ for (const size of sizes) {
       await expect(page.getByLabel('B 산화적 ATP 합성 속도', { exact: true })).toHaveText(values.atp.toFixed(1))
       if (key === 'leak') await expect(b.getByTestId('leak-path')).toBeVisible()
       else await expect(b.getByTestId('leak-path')).toHaveCount(0)
+      if (key === 'cyanide') {
+        await expect(b.getByRole('img')).toHaveAccessibleName(/복합체 IV 억제/)
+        await expect(b.locator('svg').getByText('O₂ 환원 중단')).toBeVisible()
+        await expect(b).toHaveAttribute('data-pump-rate', '0')
+      }
       if (key === 'adp') await expect(b.getByRole('status')).toContainText('ADP 부족')
       await noOverflow(page)
       await page.getByTestId('etc-comparison').screenshot({ path: `${directory}/${size.width}-${key}.png` })
@@ -62,6 +67,37 @@ for (const size of sizes) {
     expect(errors).toEqual([])
   })
 }
+
+test('terminal block and donor interruption have distinct causes on either side', async ({ page }) => {
+  await openStep(page)
+  await page.getByRole('button', { name: '정적 보기', exact: true }).click()
+  const a = page.getByTestId('etc-panel-a'), b = page.getByTestId('etc-panel-b')
+  const selectA = page.getByRole('combobox', { name: '조건 A 처리' })
+  const selectB = page.getByRole('combobox', { name: '조건 B 처리' })
+  await selectA.selectOption('cyanide')
+  await selectB.selectOption('stopped')
+  await expect(a.getByRole('heading')).toHaveText('시안화합물 처리')
+  await expect(a.locator('svg').getByText('O₂ 환원 중단')).toBeVisible()
+  await expect(b.locator('svg').getByText('전자 공급 중단')).toBeVisible()
+  await expect(b.locator('svg').getByText('O₂ 환원 중단')).toHaveCount(0)
+  for (const side of ['A', 'B']) {
+    for (const metric of ['산소 소비', '전기화학적 H⁺ 기울기', '산화적 ATP 합성 속도']) {
+      await expect(page.getByLabel(side + ' ' + metric, { exact: true })).toHaveText('0.0')
+    }
+  }
+  await expect(a.locator('.etc-scene-caption')).toContainText('산소 소비가 중단된다')
+  await page.getByRole('slider', { name: 'A / 전자전달 입력' }).fill('0.25')
+  await expect(selectA).toHaveValue('custom')
+  await expect(a.getByRole('img')).toHaveAccessibleName(/복합체 IV 억제/)
+  await expect(page.getByLabel('A 산소 소비', { exact: true })).toHaveText('0.0')
+  await selectB.selectOption('cyanide')
+  await selectA.selectOption('inhibited')
+  await expect(a.locator('svg').getByText('O₂ 환원 중단')).toHaveCount(0)
+  await expect(b.getByRole('heading')).toHaveText('시안화합물 처리')
+  await expect(page.getByLabel('B 산소 소비', { exact: true })).toHaveText('0.0')
+  expect(await numberAttribute(a, 'data-density')).toBeGreaterThan(1)
+  expect(await numberAttribute(a, 'data-electron-speed')).toBeGreaterThan(0)
+})
 
 test('animation changes, pause/resume, independent context loss, and input-stop transition', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
