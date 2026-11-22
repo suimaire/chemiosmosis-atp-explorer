@@ -312,3 +312,24 @@ footer p{margin:6px 0 0}
   .note{padding:12px 14px;font-size:15px}
   .data-case{padding:16px 14px}
 }
+
+/* Keep the navigation, diagrams and footer on the same explorer grid. */
+@media (min-width: 64rem) {
+  #root:has(.early-explorer) { --explorer-width: 94rem; }
+  #root:has(.etc-comparison) { --explorer-width: 112rem; }
+
+  #root:has(.early-explorer) :is(.site-header, .main-nav-inner, main, .footer-inner) {
+    max-width: var(--explorer-width);
+  }
+
+  #root:has(.early-explorer) .site-header { padding-block: 10px; }
+  #root:has(.early-explorer) .main-nav a { padding-block: 9px 7px; }
+  main:has(.early-explorer) > .page-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 12px;
+    padding-block: 14px 10px;
+  }
+  main:has(.early-explorer) > .page-title :is(.eyebrow, h1) { margin: 0; }
+}
