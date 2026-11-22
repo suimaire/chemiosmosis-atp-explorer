@@ -26,7 +26,7 @@ export function EtcDiagram({ state, fallback }: { state: AnimationState; fallbac
       <path d={path([[synthaseX, 1.8, 1.3], [synthaseX, -1.4, 1.3]])} stroke="#bc683a" strokeWidth="3" opacity={strength(state.synthaseRotationSpeed)} markerEnd={`url(#${id}-arrow)`} />
       {Array.from({ length: Math.round(state.protonDensity * 13) }, (_, i) => <text key={i} x={66 + (i * 71) % 537} y={85 + (i % 3) * 23} className="etc-h-symbol">+</text>)}
     </g>}
-    {(state.leakActive || (state.complexIVBlocked && state.protonLeakRate > 0)) && <g className="etc-leak-path" data-testid="leak-path" opacity={state.protonDensity > 0 ? 1 : 0.4}>
+    {(state.leakActive || ((state.complexIVBlocked || state.inputStopped) && state.protonLeakRate > 0)) && <g className="etc-leak-path" data-testid="leak-path" opacity={state.protonDensity > 0 ? 1 : 0.4}>
       <path d={path([[leakX, 1.65, 1.15], [leakX, -1.4, 1.15]])} fill="none" stroke="#ad6036" strokeWidth="4" strokeDasharray="5 4" markerEnd={`url(#${id}-arrow)`} />
       {label([leakX - 0.05, -2, 0.4], '누출', 'etc-leak-symbol')}
     </g>}
@@ -47,20 +47,21 @@ export function EtcDiagram({ state, fallback }: { state: AnimationState; fallbac
         </g>}
       </g>
     })}
-    {state.inputStopped && label([-3.9, -3.2, 0.6], '전자 공급 중단', 'etc-blocked-label')}
+    {(state.inputStopped || state.inputReduced) && label([-3.9, -3.2, 0.6], state.inputStopped ? '전자 공급 중단' : '전자 공급 감소', 'etc-blocked-label')}
     {label([-5.55, -2.42, 0.6], 'NADH', 'etc-source', 'start')}
     {label([-2.8, -2.42, 0.6], '효소 결합 FADH₂', 'etc-source')}
     {label([-1.8, 0.42, 1.5], 'Q', 'etc-carrier')}
     {label([0.5, 1.57, 0.6], 'cyt c', 'etc-carrier')}
     {label([1.5, -2.55, 0.6], oxygenStopped ? 'O₂ ↛ H₂O' : 'O₂ → H₂O', 'etc-oxygen')}
     {state.complexIVBlocked && label([1.35, -3.5, 0.6], oxygenStopped ? '산소 소비 중단' : '복합체 IV 억제 중', 'etc-blocked-label')}
-    {(!state.complexIVBlocked || hasReturn) && label([synthaseX, -2.55, 0.6], 'ATP', 'etc-atp-label')}
+    {hasReturn && label([synthaseX, -2.55, 0.6], 'ATP', 'etc-atp-label')}
     {label([synthaseX, -3.18, 0.6], 'ATP 합성효소', 'etc-complex-label')}
-    {(!state.complexIVBlocked || state.protonPumpRate > 0) && <>
+    {(state.synthaseInhibited || state.adpLimited) && label([synthaseX, -3.8, 0.6], state.synthaseInhibited && state.adpLimited ? '경로 억제, ADP 부족' : state.synthaseInhibited ? 'H⁺ 귀환 경로 억제' : 'ADP 공급 제한', 'etc-blocked-label')}
+    {(state.protonPumpRate > 0) && <>
       {label([-4.5, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
       {label([-0.95, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
     </>}
-    {!oxygenStopped && label([1.6, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
-    {(!state.complexIVBlocked || hasReturn) && label([synthaseX, 2.1, 0.6], 'H⁺ ↓', 'etc-pump-label')}
+    {state.oxygenRate > 0 && label([1.6, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
+    {hasReturn && label([synthaseX, 2.1, 0.6], 'H⁺ ↓', 'etc-pump-label')}
   </svg>
 }

@@ -1,4 +1,4 @@
-# Explorer energy polish · push snapshot
+# Explorer energy polish / push snapshot
 
 2026-10-03 (Asia/Seoul).
 
