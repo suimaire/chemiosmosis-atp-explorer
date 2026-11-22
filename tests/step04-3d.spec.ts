@@ -18,7 +18,7 @@ async function noOverflow(page: Page) {
 }
 
 for (const size of sizes) {
-  test(`Step 04 six conditions and graph consistency ${size.width}x${size.height}`, async ({ page }) => {
+  test(`Step 04 preset and graph consistency ${size.width}x${size.height}`, async ({ page }) => {
     const errors: string[] = []
     page.on('pageerror', e => errors.push(e.message))
     page.on('console', e => { if (e.type() === 'error') errors.push(e.text()) })
@@ -62,6 +62,57 @@ for (const size of sizes) {
     expect(errors).toEqual([])
   })
 }
+
+test('cyanide blocks complex IV in either panel and keeps the electron supply distinct', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openStep(page)
+  const a = page.getByTestId('etc-panel-a'), b = page.getByTestId('etc-panel-b')
+  const pickA = page.getByRole('combobox', { name: '조건 A 처리' })
+  const pickB = page.getByRole('combobox', { name: '조건 B 처리' })
+  for (const pick of [pickA, pickB]) {
+    await expect(pick.locator('option[value="stopped"] + option')).toHaveText('시안화합물 처리')
+  }
+  await pickA.selectOption({ label: '시안화합물 처리' })
+  await expect(a).toHaveAttribute('data-render-mode', '3d')
+  await expect(a.getByRole('heading')).toHaveText('시안화합물 처리')
+  await expect(a.getByRole('img')).toHaveAccessibleName(/복합체 IV 억제/)
+  await expect(a.locator('svg').getByText('산소 소비 중단')).toBeVisible()
+  await expect(a.locator('svg').getByText('O₂ ↛ H₂O')).toBeVisible()
+  await expect(page.getByRole('slider', { name: 'A / 전자전달 입력' })).toHaveValue('1')
+  await expect(page.getByRole('slider', { name: 'A / ATP 합성 경로 활성' })).toHaveValue('1')
+  for (const metric of ['산소 소비', '전기화학적 H⁺ 기울기', '산화적 ATP 합성 속도']) {
+    await expect(page.getByLabel('A ' + metric, { exact: true })).toHaveText('0.0')
+  }
+  for (const particles of ['data-electron-particles', 'data-pump-particles', 'data-return-particles']) {
+    await expect(a.locator('canvas')).toHaveAttribute(particles, '0')
+  }
+  await expect(a.locator('canvas')).toHaveAttribute('data-density', '0.0000')
+  await expect(b.getByRole('heading')).toHaveText('ATP 합성 경로 억제')
+  expect(await numberAttribute(b, 'data-density')).toBeGreaterThan(1)
+  await pickB.selectOption('stopped')
+  await expect(b.locator('svg').getByText('전자 공급 중단')).toBeVisible()
+  await expect(b.locator('svg').getByText('산소 소비 중단')).toHaveCount(0)
+  await expect(a.locator('svg').getByText('전자 공급 중단')).toHaveCount(0)
+  await page.getByRole('button', { name: '정적 보기', exact: true }).click()
+  await page.setViewportSize({ width: 390, height: 844 })
+  await pickA.selectOption('normal')
+  await pickB.selectOption('cyanide')
+  await expect(b).toHaveAttribute('data-render-mode', 'static')
+  await expect(b.getByRole('heading')).toHaveText('시안화합물 처리')
+  await expect(b.locator('svg').getByText('O₂ ↛ H₂O')).toBeVisible()
+  await expect(b.getByRole('status')).toContainText('시토크롬 c 산화효소')
+  await expect(b.locator('svg').getByText('H⁺ ↑')).toHaveCount(0)
+  await expect(page.getByLabel('B 산소 소비', { exact: true })).toHaveText('0.0')
+  await expect(page.getByLabel('A 산소 소비', { exact: true })).toHaveText('100.0')
+  await page.getByRole('slider', { name: 'B / ADP 가용성' }).fill('0.5')
+  await expect(pickB).toHaveValue('custom')
+  await expect(b.getByRole('img')).toHaveAccessibleName(/복합체 IV 억제/)
+  await expect(b).toHaveAttribute('data-atp-rate', '0')
+  await pickB.selectOption('normal')
+  await expect(b.locator('svg').getByText('산소 소비 중단')).toHaveCount(0)
+  await expect(page.getByLabel('B 산소 소비', { exact: true })).toHaveText('100.0')
+  await noOverflow(page)
+})
 
 test('animation changes, pause/resume, independent context loss, and input-stop transition', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -144,6 +195,11 @@ test('WebGL unavailable falls back and still updates graphs and independent A/B 
   await expect(a).toHaveAttribute('data-density', String(relativeState(normal).gradient / 100))
   await expect(page.getByLabel('B 산소 소비', { exact: true })).toHaveText(relativeState(presets.leak.condition).oxygen.toFixed(1))
   await page.getByTestId('etc-comparison').screenshot({ path: `${directory}/webgl-unavailable.png` })
+  await page.getByRole('combobox', { name: '조건 A 처리' }).selectOption('cyanide')
+  await expect(a.locator('svg').getByText('O₂ ↛ H₂O')).toBeVisible()
+  await expect(a.getByRole('status')).toContainText('최종 전자수용체')
+  await expect(a).toHaveAttribute('data-pump-rate', '0')
+  await expect(b.getByRole('heading')).toHaveText(presets.leak.label)
   await page.getByRole('button', { name: '04 산소 소비와 ATP 합성 자료 해석', exact: true }).click()
   await expect(page.getByRole('heading', { name: '가상 조건 1' })).toBeVisible()
 })

@@ -27,21 +27,37 @@ export function EtcDiagram({ state, fallback }: { state: AnimationState; fallbac
       <path d={path([[leakX, 1.65, 1.15], [leakX, -1.4, 1.15]])} fill="none" stroke="#ad6036" strokeWidth="4" strokeDasharray="5 4" markerEnd={`url(#${id}-arrow)`} />
       {label([leakX - 0.05, -2, 0.4], '누출', 'etc-leak-symbol')}
     </g>}
-    <text x="22" y="31" className="etc-region">H⁺ 기울기</text>
+    <text x="22" y="31" className="etc-region">{state.complexIVBlocked ? 'H⁺ 기울기 소실' : 'H⁺ 기울기'}</text>
     <text x="22" y="54" className="etc-region-sub">막사이공간</text>
     <text x="22" y="421" className="etc-region-sub">미토콘드리아 기질</text>
     {label([-5.25, -0.58, 1.6], '내막', 'etc-membrane-label', 'end')}
-    {complexes.map(c => { const v = project([c.x, c.pump ? -1.38 : -1.27, 0.6]); return <text key={c.name} x={v.x} y={v.y} textAnchor="middle" className="etc-complex-label"><tspan className="etc-complex-prefix">복합체 </tspan>{c.name}</text> })}
+    {complexes.map(c => {
+      const v = project([c.x, c.pump ? -1.38 : -1.27, 0.6])
+      const center = project([c.x, 0, 0])
+      const blocked = c.name === 'IV' && state.complexIVBlocked
+      return <g key={c.name}>
+        <text x={v.x} y={v.y} textAnchor="middle" className={blocked ? 'etc-complex-label etc-blocked-label' : 'etc-complex-label'}>
+          <tspan className="etc-complex-prefix">복합체 </tspan>{c.name}{blocked && ' 억제'}
+        </text>
+        {blocked && <g transform={`translate(${center.x} ${center.y})`} stroke="#973d37" strokeWidth="5">
+          <circle r="18" fill="#fff5ed" /><path d="M-12 12L12 -12" />
+        </g>}
+      </g>
+    })}
+    {state.inputStopped && label([-3.9, -3.2, 0.6], '전자 공급 중단', 'etc-blocked-label')}
     {label([-5.55, -2.42, 0.6], 'NADH', 'etc-source', 'start')}
     {label([-2.8, -2.42, 0.6], '효소 결합 FADH₂', 'etc-source')}
     {label([-1.8, 0.42, 1.5], 'Q', 'etc-carrier')}
     {label([0.5, 1.57, 0.6], 'cyt c', 'etc-carrier')}
-    {label([1.5, -2.55, 0.6], 'O₂ → H₂O', 'etc-oxygen')}
-    {label([synthaseX, -2.55, 0.6], 'ATP', 'etc-atp-label')}
+    {label([1.5, -2.55, 0.6], state.complexIVBlocked ? 'O₂ ↛ H₂O' : 'O₂ → H₂O', 'etc-oxygen')}
+    {state.complexIVBlocked && label([1.35, -3.5, 0.6], '산소 소비 중단', 'etc-blocked-label')}
+    {!state.complexIVBlocked && label([synthaseX, -2.55, 0.6], 'ATP', 'etc-atp-label')}
     {label([synthaseX, -3.18, 0.6], 'ATP 합성효소', 'etc-complex-label')}
-    {label([-4.5, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
-    {label([-0.95, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
-    {label([1.6, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
-    {label([synthaseX, 2.1, 0.6], 'H⁺ ↓', 'etc-pump-label')}
+    {!state.complexIVBlocked && <>
+      {label([-4.5, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
+      {label([-0.95, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
+      {label([1.6, 2.1, 0.6], 'H⁺ ↑', 'etc-pump-label')}
+      {label([synthaseX, 2.1, 0.6], 'H⁺ ↓', 'etc-pump-label')}
+    </>}
   </svg>
 }

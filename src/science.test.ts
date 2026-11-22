@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { coupledEnergy, defaultGradient, F, normal, presets, protonEnergy, relativeState, steadyState } from './science'
+import { coupledEnergy, defaultGradient, F, normal, presetKeyFor, presets, protonEnergy, relativeState, steadyState } from './science'
 
 describe('proton electrochemical energy, A → B', () => {
   it('zero gradient has zero energy and no preferred direction', () => {
@@ -63,6 +63,18 @@ describe('limited steady-state teaching model', () => {
   })
   it('input suppression lowers all indicators', () => { for (const v of Object.values(relativeState(presets.reduced.condition))) expect(v).toBeLessThan(100) })
   it('stopped input has zero steady-state gradient, oxygen and ATP', () => expect(steadyState(presets.stopped.condition)).toEqual({ gradient: 0, oxygen: 0, atp: 0 }))
+  it('complete complex IV inhibition stops respiration with normal electron supply and synthase activity', () => {
+    const treated = presets.cyanide.condition
+    expect(treated).toEqual({ ...normal, complexIVActivity: 0 })
+    expect(steadyState(treated)).toEqual({ gradient: 0, oxygen: 0, atp: 0 })
+    expect(relativeState(treated)).toEqual(relativeState(presets.stopped.condition))
+    expect(presetKeyFor(treated)).toBe('cyanide')
+    expect(presetKeyFor(presets.stopped.condition)).toBe('stopped')
+    expect(presetKeyFor({ ...treated, input: 0 })).toBeUndefined()
+    const legacy = { input: 1, adp: 1, leak: 0.12, synthase: 1 }
+    expect(presetKeyFor(legacy)).toBe('normal')
+    expect(steadyState(legacy)).toEqual(steadyState(normal))
+  })
   it('zero ADP prevents oxidative ATP synthesis', () => expect(steadyState({ ...normal, adp: 0 }).atp).toBe(0))
   it('zero synthase activity prevents oxidative ATP synthesis', () => expect(steadyState({ ...normal, synthase: 0 }).atp).toBe(0))
   it('steady state balances pumping with proton return for all presets', () => {
