@@ -54,9 +54,11 @@ export function Explorer() {
         <EtcComparison3D a={a} b={b} controls={{
           A: { preset: <PresetPicker name="A" value={a} setValue={setA} />, adjust: <ConditionControls name="A" value={a} setValue={setA} /> },
           B: { preset: <PresetPicker name="B" value={b} setValue={setB} />, adjust: <ConditionControls name="B" value={b} setValue={setB} /> },
-        }} />
-        <section className="results-block" aria-labelledby="ab-results-title"><h3 id="ab-results-title" className="lesson-section-title">정상상태의 산소 소비, H⁺ 기울기, ATP 합성</h3><p className="note">산소와 호흡 기질의 공급이 충분할 때, H⁺ 기울기가 커지면 H⁺를 더 수송하는 데 필요한 일이 증가해 전자전달이 느려진다.</p><Results a={a} b={b} /></section>
-        <p className="quiet">전자 공급이 중단되거나 복합체 IV가 억제된 조건의 값은 기존 기울기가 소진된 후의 정상상태에 해당한다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>유효 전자전달 입력 E는 전자 공급량(input)과 복합체 IV 활성(작동 시 1, 완전 억제 시 0)의 곱이다. 무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = E × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = E / (E + leak + 0.75 × ADP × synthase)이다.</p><p>leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
+        }} renderResults={(values, transient) => <section className="results-block" aria-labelledby="ab-results-title">
+          <h3 id="ab-results-title" className="lesson-section-title">{transient ? '처리 과정의 산소 소비, H⁺ 기울기, ATP 합성' : '정상상태의 산소 소비, H⁺ 기울기, ATP 합성'}</h3>
+          <Results values={values} />
+        </section>} />
+        <p className="quiet">시안화합물 처리 과정은 정상 결합 상태에서 시작한다. 재생 시간은 변화 순서를 관찰하기 위한 교육용 시간이다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>유효 전자전달 입력 E는 전자 공급량(input)과 복합체 IV 활성(작동 시 1, 완전 억제 시 0)의 곱이다. 무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = E × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = E / (E + leak + 0.75 × ADP × synthase)이다.</p><p>leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
       </>}
       {module === 4 && <Inference />}
       {module === 5 && <><p className="step-lead">두 막에서 ATP 합성효소의 촉매 부위는 어느 쪽을 향하며, H⁺는 어느 방향으로 이동하는가?</p><div className="diagram-panel"><Membrane context="plant" /></div><Bridge /><Quiz questions={[
@@ -75,8 +77,8 @@ function ConditionControls({ name, value, setValue }: { name: string; value: Con
   return <section className="condition" aria-label={`조건 ${name}`}><h3>조건 {name} 세부 조절</h3><div className="condition-sliders"><Range label={`${name} / 전자전달 입력`} min={0} max={1} step={0.05} value={value.input} onChange={v => setValue({ ...value, input: v })} /><Range label={`${name} / ATP 합성 경로 활성`} min={0} max={1} step={0.01} value={value.synthase} onChange={v => setValue({ ...value, synthase: v })} /><Range label={`${name} / H⁺ 누출 전도도`} min={0.02} max={2} step={0.01} value={value.leak} onChange={v => setValue({ ...value, leak: v })} /><Range label={`${name} / ADP 가용성`} min={0} max={1} step={0.05} value={value.adp} onChange={v => setValue({ ...value, adp: v })} /></div></section>
 }
 const metricLabels = { oxygen: '산소 소비', gradient: '전기화학적 H⁺ 기울기', atp: '산화적 ATP 합성 속도' }
-function Results({ a, b, masked = false }: { a: Condition; b?: Condition; masked?: boolean }) {
-  const values = [relativeState(a), ...(b ? [relativeState(b)] : [])]
+function Results({ values, masked = false }: { values: ReturnType<typeof relativeState>[]; masked?: boolean }) {
+  const b = values.length > 1
   return <div className={`model-results ${b ? '' : 'single-bars'}`} aria-label="모형 결과"><p className="quiet">{masked ? '가상 자료' : '모형 계산값'} / 점선은 정상 조건(100), 눈금은 0–220</p>{(Object.keys(metricLabels) as (keyof typeof metricLabels)[]).map(key => <div className="bar-row" key={key}><p className="bar-title">{metricLabels[key]}</p>{values.map((v, i) => <div className="bar-line" key={i}>{b && <span>{i ? 'B' : 'A'}</span>}<div className="bar-track"><div className={`bar-fill ${i ? 'b' : ''}`} style={{ width: `${v[key] / 2.2}%` }} /></div><output aria-label={`${b ? i ? 'B ' : 'A ' : ''}${metricLabels[key]}`}>{v[key].toFixed(1)}</output></div>)}</div>)}</div>
 }
 function Inference() {
@@ -86,5 +88,5 @@ function Inference() {
     { key: 'inhibited' as const, reason: 'ATP 합성효소를 통한 H⁺ 이동이 감소하면 ATP 합성 속도는 낮아지고 기울기는 커진다. 이 기울기에 맞서 H⁺를 수송해야 하므로 전자전달과 산소 소비도 감소한다.' },
     { key: 'reduced' as const, reason: '전자전달 입력이 감소하면 O₂로 전달되는 전자와 막사이공간으로 수송되는 H⁺가 모두 줄어든다. 그 결과 산소 소비, 기울기, ATP 합성 속도가 함께 감소한다.' },
   ]
-  return <><p className="step-lead">산소 소비, H⁺ 기울기, ATP 합성 속도를 근거로 각 조건의 처리를 선택하세요.</p><p className="note">각 조건에서 산소와 호흡 기질은 충분하다. 정상 조건에서 변수 하나만 바꾼 뒤 정상상태를 비교했다.</p><div className="inference-cases">{cases.map((c, i) => <section className="data-case" key={i}><h3>가상 조건 {i + 1}</h3><Results a={presets[c.key].condition} masked /><div className="quiz-options">{(['inhibited', 'leak', 'reduced'] as const).map(key => <button key={key} aria-pressed={answers[i] === key} onClick={() => setAnswers({ ...answers, [i]: key })}>{presets[key].label}</button>)}</div>{answers[i] && <p className={`feedback ${answers[i] === c.key ? 'correct' : 'retry'}`} role="status"><strong>{answers[i] === c.key ? '정답입니다.' : '오답입니다.'}</strong> {c.reason}</p>}</section>)}</div></>
+  return <><p className="step-lead">산소 소비, H⁺ 기울기, ATP 합성 속도를 근거로 각 조건의 처리를 선택하세요.</p><p className="note">각 조건에서 산소와 호흡 기질은 충분하다. 정상 조건에서 변수 하나만 바꾼 뒤 정상상태를 비교했다.</p><div className="inference-cases">{cases.map((c, i) => <section className="data-case" key={i}><h3>가상 조건 {i + 1}</h3><Results values={[relativeState(presets[c.key].condition)]} masked /><div className="quiz-options">{(['inhibited', 'leak', 'reduced'] as const).map(key => <button key={key} aria-pressed={answers[i] === key} onClick={() => setAnswers({ ...answers, [i]: key })}>{presets[key].label}</button>)}</div>{answers[i] && <p className={`feedback ${answers[i] === c.key ? 'correct' : 'retry'}`} role="status"><strong>{answers[i] === c.key ? '정답입니다.' : '오답입니다.'}</strong> {c.reason}</p>}</section>)}</div></>
 }

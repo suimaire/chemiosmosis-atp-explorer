@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { normal, presets, relativeState, steadyState, type Condition } from '../../science'
 import { mapAnimationState, STOP_TRANSITION_SECONDS, stopTransition } from './animationState'
 import { EtcComparison3D } from './EtcComparison3D'
+import { cyanideDuration, cyanideFrame } from './cyanideTransition'
 import { complexes, electronPaths } from './sceneLayout'
 
 const preferences = { reducedMotion: false, compact: false }
@@ -80,6 +81,30 @@ describe('Step 04 output-to-animation mapping', () => {
     expect(halfway.synthaseRotationSpeed).toBeGreaterThan(0)
     expect(stopTransition(reference, stopped, STOP_TRANSITION_SECONDS)).toEqual(stopped)
     expect(stopTransition(reference, stopped, 10)).toEqual(stopped)
+  })
+  it('retains the proton gradient and basal leak after the terminal oxygen reaction stops', () => {
+    const treated = presets.cyanide.condition
+    const stateAt = (seconds: number) => mapAnimationState(treated, relativeState(treated), preferences, cyanideFrame(seconds))
+    expect(stateAt(0)).toEqual(reference)
+    const terminal = stateAt(2), upstream = stateAt(3.1), reservoir = stateAt(4.6)
+    expect(terminal.oxygenRate).toBe(0)
+    expect(terminal.electronFlowSpeed).toBe(1)
+    expect(upstream.electronFlowSpeed).toBeLessThan(1)
+    expect(upstream.protonPumpRate).toBeGreaterThan(0)
+    expect(reservoir.protonPumpRate).toBe(0)
+    expect(reservoir.protonLeakRate).toBeGreaterThan(0)
+    expect(reservoir.synthaseRotationSpeed).toBeCloseTo(0.8)
+    let prior = stateAt(0)
+    for (let t = 0; t <= cyanideDuration; t += 0.125) {
+      const state = stateAt(t)
+      for (const key of ['oxygenRate','electronFlowSpeed','protonDensity','atpPulseRate'] as const) {
+        expect(state[key]).toBeGreaterThanOrEqual(0)
+        expect(state[key]).toBeLessThanOrEqual(prior[key])
+      }
+      expect(state.atpPulseRate).toBe(state.protonDensity)
+      prior = state
+    }
+    expect(stateAt(cyanideDuration)).toEqual(map(treated))
   })
   it('only I, III and IV pump; electron paths include II without flowing to ATP synthase', () => {
     expect(complexes.filter(c => c.pump).map(c => c.name)).toEqual(['I', 'III', 'IV'])

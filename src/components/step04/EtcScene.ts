@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { STOP_TRANSITION_SECONDS, stopTransition, type AnimationState } from './animationState'
-import { complexes, electronPaths, leakX, synthaseX, type Point } from './sceneLayout'
+import { complexes, electronPaths, leakX, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
 
 export type PathVisibility = { electrons: boolean; protons: boolean; atp: boolean }
 export type SceneController = { update: (state: AnimationState, paused: boolean) => void; setPaths: (paths: PathVisibility) => void; dispose: () => void }
@@ -79,7 +79,8 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     const line = new THREE.Line(g, m); line.computeLineDistances(); scene.add(line); return line
   }
   const electronLines = visibleElectronPaths.map(p => makePath(p, 0x428bad, true))
-  const pumpPaths: Point[][] = complexes.filter(c => c.pump).map(c => [[c.x - 0.42, -1, 1.3], [c.x - 0.42, 1.85, 1.3]])
+  const pumpingComplexes = complexes.filter(c => c.pump)
+  const pumpPaths: Point[][] = pumpingComplexes.map(c => [[c.x - 0.42, -1, 1.3], [c.x - 0.42, 1.85, 1.3]])
   const returnPath: Point[] = [[synthaseX, 1.7, 1.15], [synthaseX, -1.35, 1.15]]
   const leakPath: Point[] = [[leakX, 1.7, 1.15], [leakX, -1.5, 1.15]]
   const pumpLines = pumpPaths.map(p => makePath(p, 0xc87542))
@@ -129,12 +130,22 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     phases.leak += dt * s.protonLeakRate * 0.6 * motion
     phases.atp += dt * s.atpPulseRate * 0.4 * motion
     phases.oxygen += dt * s.oxygenRate * 0.45 * motion
-    electronLines.forEach(line => { line.material.opacity = s.electronFlowSpeed > 0 ? 0.6 : 0.15 })
-    electrons.forEach((pool, i) => movePool(pool, electronCurves[i], phases.electron, s.electronFlowSpeed, budget))
-    pumps.forEach((pool, i) => movePool(pool, pumpCurves[i], phases.pump, s.protonPumpRate, budget))
+    electrons.forEach((pool, i) => {
+      const terminal = visibleElectronPaths[i] === terminalElectronPath
+      const rate = terminal ? s.oxygenRate : s.electronFlowSpeed
+      electronLines[i].material.opacity = 0.15 + 0.45 * Math.min(1, rate)
+      movePool(pool, electronCurves[i], terminal ? phases.oxygen : phases.electron, rate, budget)
+    })
+    pumps.forEach((pool, i) => {
+      const terminal = pumpingComplexes[i].name === 'IV'
+      const rate = terminal ? s.oxygenRate : s.protonPumpRate
+      movePool(pool, pumpCurves[i], terminal ? phases.oxygen : phases.pump, rate, budget)
+      pumpLines[i].visible = pumpArrows[i].visible = paths.protons && (!s.complexIVBlocked || rate > 0)
+    })
     movePool(returns, returnCurve, phases.synthase, s.synthaseRotationSpeed, budget)
-    movePool(leaks, leakCurve, phases.leak, s.leakActive ? s.protonLeakRate : 0, budget)
-    leakTube.visible = s.leakActive
+    const showLeak = s.leakActive || (s.complexIVBlocked && s.protonLeakRate > 0)
+    movePool(leaks, leakCurve, phases.leak, showLeak ? s.protonLeakRate : 0, budget)
+    leakTube.visible = showLeak
     rotor.rotation.y = phases.synthase * Math.PI * 2
     cloud.count = Math.min(60, Math.round(s.protonDensity * 30 * budget))
     for (let i = 0; i < cloud.count; i++) { matrix.makeTranslation(...cloudPositions[i]); cloud.setMatrixAt(i, matrix) }
@@ -159,10 +170,9 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     // Visibility is a teaching aid only. It never changes flux or thermodynamics.
     electronLines.forEach(m => { m.visible = paths.electrons })
     electrons.flat().forEach(m => { m.visible = m.visible && paths.electrons })
-    ;[...pumpLines, ...pumpArrows].forEach(m => { m.visible = paths.protons && !s.complexIVBlocked })
     cloud.visible = paths.protons
     pumps.flat().forEach(m => { m.visible = m.visible && paths.protons })
-    returnLine.visible = returnArrow.visible = paths.atp && !s.complexIVBlocked
+    returnLine.visible = returnArrow.visible = paths.atp && (!s.complexIVBlocked || s.synthaseRotationSpeed > 0)
     rotor.visible = paths.atp
     returns.forEach(m => { m.visible = m.visible && paths.atp })
     atps.forEach(m => { m.visible = m.visible && paths.atp })
@@ -225,8 +235,9 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
       if (changed && !state.complexIVBlocked && state.inputStopped && !target.inputStopped && state.motionIntensity === 1 && !isPaused && inView) {
         previous = displayed; elapsed = 0; callbacks.onTransition(true)
       } else if (changed || isPaused) { elapsed = STOP_TRANSITION_SECONDS; callbacks.onTransition(false) }
+      const pauseChanged = paused !== isPaused
       target = state; paused = isPaused
-      try { render(0); schedule() } catch { fail() }
+      try { render(0); if (pauseChanged) schedule() } catch { fail() }
     },
     dispose,
   }

@@ -1,5 +1,7 @@
 import { normal, relativeState, steadyState, type Condition } from '../../science'
 
+import type { CyanideFrame } from './cyanideTransition'
+
 export type AnimationState = {
   electronFlowSpeed: number
   protonPumpRate: number
@@ -17,20 +19,20 @@ export type AnimationState = {
   particleBudget: number
 }
 export type DisplayPreferences = { reducedMotion: boolean; compact: boolean }
-export function mapAnimationState(condition: Condition, output: ReturnType<typeof relativeState>, preferences: DisplayPreferences): AnimationState {
+export function mapAnimationState(condition: Condition, output: ReturnType<typeof relativeState>, preferences: DisplayPreferences, frame: CyanideFrame | null = null): AnimationState {
   const flux = steadyState(condition)
   const reference = steadyState(normal)
   // Normal = 1. One shared scale per process across both panels, never per-panel normalization.
   return {
-    electronFlowSpeed: output.oxygen / 100,
-    protonPumpRate: output.oxygen / 100,
-    oxygenRate: output.oxygen / 100,
-    protonDensity: output.gradient / 100,
-    synthaseRotationSpeed: output.atp / 100,
-    atpPulseRate: output.atp / 100,
-    protonLeakRate: condition.leak * flux.gradient / reference.oxygen,
+    electronFlowSpeed: frame?.electrons ?? output.oxygen / 100,
+    protonPumpRate: frame?.electrons ?? output.oxygen / 100,
+    oxygenRate: frame?.oxygen ?? output.oxygen / 100,
+    protonDensity: frame?.gradient ?? output.gradient / 100,
+    synthaseRotationSpeed: frame?.atp ?? output.atp / 100,
+    atpPulseRate: frame?.atp ?? output.atp / 100,
+    protonLeakRate: condition.leak * (frame ? frame.gradient * reference.gradient : flux.gradient) / reference.oxygen,
     leakActive: condition.leak > normal.leak,
-    complexIVBlocked: condition.complexIVActivity === 0,
+    complexIVBlocked: frame ? frame.index > 0 : condition.complexIVActivity === 0,
     inputStopped: condition.input === 0,
     adpLimited: condition.adp < 0.5,
     synthaseInhibited: condition.synthase < 0.2,
