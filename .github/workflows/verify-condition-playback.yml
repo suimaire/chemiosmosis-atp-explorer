@@ -16,6 +16,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium
+      - run: npx playwright test tests/learning.spec.ts --grep 'production counter import failure' --repeat-each=3
       - name: Verify the deployed HTML and its compiled assets
         run: |
           node --input-type=module <<'NODE'
@@ -26,7 +27,7 @@ jobs:
           const assets = [...html.matchAll(/(?:src|href)="([^"]*\/assets\/[^"]+)"/g)].map(match => match[1])
           if (!assets.length) throw Error('No compiled assets in index.html')
           let verified = false
-          for (let attempt = 0; attempt < 120; attempt++) {
+          for (let attempt = 0; attempt < 168; attempt++) {
             const response = await fetch(site + '?revision=' + process.env.GITHUB_SHA + '&attempt=' + attempt)
             const body = await response.text()
             if (response.ok && assets.every(path => body.includes(path))) { verified = true; break }
