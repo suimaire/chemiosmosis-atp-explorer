@@ -240,3 +240,17 @@
   .coupling-reaction{padding:14px 0 4px;border-top:1px solid var(--line)}
   .coupling-visual figcaption{padding:10px 12px}
 }
+
+@media (min-width: 64rem) {
+  .early-explorer .module-nav { margin-bottom: 16px; }
+  .early-explorer .module-nav button {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    min-height: 44px;
+    padding-block: 8px;
+  }
+  .early-explorer:has(.etc-comparison) .module-nav { margin-bottom: 12px; }
+  .module-content:has(.etc-comparison) > .module-title { margin-bottom: 2px; }
+  .module-content:has(.etc-comparison) > .step-lead { margin-bottom: 8px; }
+}

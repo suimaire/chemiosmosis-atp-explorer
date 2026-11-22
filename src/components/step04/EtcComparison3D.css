@@ -1,4 +1,4 @@
-.etc-comparison{container-type:inline-size;margin:4px 0 8px;min-width:0}
+.etc-comparison{container:comparison / inline-size;margin:4px 0 8px;min-width:0}
 .etc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 .etc-toolbar h3{font-size:19px;margin:0}
 .etc-view-controls{display:flex;gap:6px;flex-wrap:wrap}
@@ -89,3 +89,101 @@
 .etc-playback>div{display:flex;flex-wrap:wrap;gap:8px}
 .etc-playback button{border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--text);min-height:36px;padding:4px 12px;font:inherit;font-size:14px}
 .etc-playback button:disabled{opacity:.5}
+
+/* Share a single row for the legend and display controls when all three groups fit. */
+@media (min-width: 80rem) {
+  .etc-comparison {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 20px;
+  }
+  .etc-toolbar { display: contents; }
+  .etc-toolbar > :first-child { grid-area: 1 / 1; }
+  .etc-legend { grid-area: 1 / 2; }
+  .etc-view-controls { grid-area: 1 / 3; }
+  .etc-grid, .etc-motion-note, .etc-footnote { grid-column: 1 / -1; }
+}
+
+/* On a desktop, compare the same rows even when one condition needs more text. */
+@container comparison (min-width: 58rem) {
+  .etc-toolbar { margin-bottom: 2px; }
+  .etc-view-controls button { min-height: 36px; padding-block: 4px; }
+  .etc-legend { padding-block: 5px; margin-bottom: 8px; }
+  .etc-grid { align-items: stretch; }
+  .etc-column {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 8px;
+  }
+  .preset-picker {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+  }
+  .etc-panel-heading { padding-block: 7px; }
+  .etc-panel-heading > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+  .etc-scene-caption { padding-block: 5px; }
+  .etc-state-note { min-height: 0; padding-block: 7px; }
+  .etc-playback {
+    grid-template-columns: minmax(3rem, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+  .etc-playback progress { min-width: 0; }
+}
+
+@container comparison (min-width: 76rem) {
+  .etc-legend { margin: 0; border: 0; }
+}
+
+@container comparison (min-width: 70rem) {
+  .etc-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto 1fr auto;
+    grid-template-areas: "heading" "summary" "scene" "caption" "note" "playback";
+  }
+  .etc-panel-heading { grid-area: heading; }
+  .etc-summary { grid-area: summary; padding-block: 7px; background: var(--surface); }
+  .etc-summary dd { font-size: 16px; }
+  .etc-summary small { font-size: 16px; color: var(--text); font-weight: 600; }
+  .etc-scene { grid-area: scene; align-self: start; }
+  .etc-scene-caption { grid-area: caption; }
+  .etc-state-note { grid-area: note; }
+  .etc-playback { grid-area: playback; }
+}
+
+/* Give the diagram and all four readings the same line of sight at full width.
+   The canvas and SVG keep their shared 680:450 projection. */
+@container comparison (min-width: 90rem) {
+  .etc-panel {
+    grid-template-columns: minmax(0, 1fr) 8.5rem;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas:
+      "heading heading"
+      "scene summary"
+      "caption caption"
+      "note note"
+      "playback playback";
+  }
+  .etc-summary {
+    grid-template-columns: 1fr;
+    align-content: space-evenly;
+    padding-inline: 16px;
+    border-left: 1px solid var(--line);
+  }
+  .etc-summary dd { line-height: 1.4; }
+  .etc-summary small { display: block; margin: 2px 0 0; font-size: 20px; }
+}
+
+/* A scaled FHD desktop has room beside the scene but fewer rows above the fold. */
+@media (max-height: 55rem) {
+  @container comparison (min-width: 90rem) {
+    .etc-summary { align-content: start; gap: 16px; padding: 12px 8px; }
+    .etc-summary dd { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; font-size: 14px; }
+    .etc-summary small { margin: 0; font-size: 16px; }
+  }
+}
