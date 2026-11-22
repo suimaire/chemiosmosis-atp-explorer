@@ -8,6 +8,8 @@ function CarrierSite({ site, shift }: { site: keyof typeof carrierSites; shift: 
   const center = project(carrier.position)
   const anchor = project(carrier.label)
   const reveal = Math.min(1, shift * 5)
+  // Reveal the longer wording once the carrier name has cleared the pump label.
+  const detailOpacity = Math.max(0, (reveal - 0.8) / 0.2)
   const isQ = site === 'q'
   // Move the original name with its suffix so two labels never cross-fade over each other.
   const left = anchor.x - (isQ ? 6 : 17)
@@ -21,8 +23,8 @@ function CarrierSite({ site, shift }: { site: keyof typeof carrierSites; shift: 
     </g>}
     {shift === 0 ? <text x={anchor.x} y={anchor.y} textAnchor="middle" className="etc-carrier">{carrier.name}</text> :
       <text x={x} y={y} className="etc-reduction-label" xmlSpace="preserve">
-        {!isQ && <tspan x={x} textAnchor="end" opacity={reveal}>환원형 </tspan>}
-        <tspan x={x}>{carrier.name}</tspan><tspan opacity={reveal}>{isQ ? 'H₂ 증가' : ' 증가'}</tspan>
+        {!isQ && detailOpacity > 0 && <tspan x={x} textAnchor="end" opacity={detailOpacity}>환원형 </tspan>}
+        <tspan x={x}>{carrier.name}</tspan>{detailOpacity > 0 && <tspan opacity={detailOpacity}>{isQ ? 'H₂ 증가' : ' 증가'}</tspan>}
       </text>}
   </g>
 }
