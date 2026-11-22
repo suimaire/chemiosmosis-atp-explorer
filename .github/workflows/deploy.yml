@@ -1,14 +1,11 @@
-name: Verify and deploy Pages
+name: Verify mitochondrial comparison
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [verify/complex-iv-152e53c]
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
-  group: pages
+  group: verify-complex-iv
   cancel-in-progress: false
 jobs:
   build:
@@ -24,17 +21,3 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
