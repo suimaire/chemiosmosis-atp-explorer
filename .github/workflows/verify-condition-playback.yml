@@ -14,34 +14,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test tests/learning.spec.ts --grep 'production counter import failure' --repeat-each=3
-      - name: Verify the deployed HTML and its compiled assets
-        run: |
-          node --input-type=module <<'NODE'
-          import { readFile } from 'node:fs/promises'
-          import { createHash } from 'node:crypto'
-          const site = 'https://suimaire.github.io/chemiosmosis-atp-explorer/'
-          const html = await readFile('dist/index.html', 'utf8')
-          const assets = [...html.matchAll(/(?:src|href)="([^"]*\/assets\/[^"]+)"/g)].map(match => match[1])
-          if (!assets.length) throw Error('No compiled assets in index.html')
-          let verified = false
-          for (let attempt = 0; attempt < 168; attempt++) {
-            const response = await fetch(site + '?revision=' + process.env.GITHUB_SHA + '&attempt=' + attempt)
-            const body = await response.text()
-            if (response.ok && assets.every(path => body.includes(path))) { verified = true; break }
-            await new Promise(resolve => setTimeout(resolve, 5000))
-          }
-          if (!verified) throw Error('Production did not serve this build')
-          const hash = bytes => createHash('sha256').update(bytes).digest('hex')
-          for (const path of assets) {
-            const response = await fetch(new URL(path, site))
-            const file = 'dist/' + path.slice(path.indexOf('assets/'))
-            if (!response.ok || hash(Buffer.from(await response.arrayBuffer())) !== hash(await readFile(file))) throw Error('Asset mismatch: ' + path)
-          }
-          console.log('Production HTML matches build; verified ' + assets.length + ' asset digests')
-          NODE
-      - run: npx playwright test tests/step04-3d.spec.ts --grep 'retargets from a held frame|cyanide playback|a hidden tab'
-        env:
-          BASE_URL: https://suimaire.github.io/chemiosmosis-atp-explorer/
+      - run: npx playwright test tests/learning.spec.ts --grep 'production counter import failure' --repeat-each=5

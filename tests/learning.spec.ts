@@ -104,15 +104,13 @@ test('hash refresh, history, skip link, reduced motion and blocked storage', asy
   await page.getByRole('button', { name: '✓ 광합성 학습 확인', exact: true }).click()
   await expect(page.getByRole('button', { name: '✓ 학습 확인 완료', exact: true })).toBeVisible()
 })
-test('production counter import failure does not interrupt the app', async ({ page, baseURL }) => {
-  const real = baseURL || ''
+test('production counter import failure does not interrupt the app', async ({ page }) => {
   if (!process.env.BASE_URL) {
     // Serve the built local app under its production origin, exercising the real
     // integration without sending an actual counter request.
     await page.route('https://suimaire.github.io/chemiosmosis-atp-explorer/**', async route => {
-      const local = route.request().url().replace('https://suimaire.github.io/chemiosmosis-atp-explorer/', real)
-      const response = await page.request.get(local)
-      await route.fulfill({ response })
+      const file = new URL(route.request().url()).pathname.slice('/chemiosmosis-atp-explorer/'.length)
+      await route.fulfill({ path: 'dist/' + (file || 'index.html') })
     })
   }
   await page.route('https://suimaire.github.io/assets/js/page-views.js', route => route.abort())
@@ -122,6 +120,7 @@ test('production counter import failure does not interrupt the app', async ({ pa
     await page.goto('https://suimaire.github.io/chemiosmosis-atp-explorer/')
     await page.getByRole('link', { name: '탐색기 열기 →', exact: true }).click()
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('화학삼투와 ATP 합성 탐색기')
+    await page.waitForLoadState('networkidle')
     expect(errors).toEqual([])
   } finally {
     // The explorer may still be fetching its lazy Three.js chunk when the page heading appears.
