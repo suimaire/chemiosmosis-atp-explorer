@@ -201,7 +201,9 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     if (raf) cancelAnimationFrame(raf)
     raf = 0; last = 0
     canvas.dataset.motion = paused ? 'paused' : !inView ? 'offscreen' : document.hidden ? 'hidden' : disposed ? 'disposed' : 'running'
-    if (!disposed && !paused && inView && !document.hidden) raf = requestAnimationFrame(tick)
+    if (disposed || !inView || document.hidden) return
+    if (paused) { try { render(0) } catch { fail() } }
+    else raf = requestAnimationFrame(tick)
   }
   const resize = new ResizeObserver(() => {
     if (disposed) return
@@ -231,7 +233,7 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
       if (disposed) return
       try {
         if (pauseChanged) schedule()
-        if (paused && inView && !document.hidden) render(0)
+        else if (paused && inView && !document.hidden) render(0)
       } catch { fail() }
     },
     dispose,
