@@ -228,7 +228,11 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     update(state, isPaused) {
       const pauseChanged = paused !== isPaused
       target = state; paused = isPaused
-      try { render(0); if (pauseChanged) schedule() } catch { fail() }
+      if (disposed) return
+      try {
+        if (pauseChanged) schedule()
+        if (paused && inView && !document.hidden) render(0)
+      } catch { fail() }
     },
     dispose,
   }

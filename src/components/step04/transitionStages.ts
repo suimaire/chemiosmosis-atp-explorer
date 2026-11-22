@@ -56,7 +56,18 @@ const stages: Record<TransitionKey, readonly Stage[]> = {
   ],
 }
 
-export function stagesFor(key: TransitionKey, previous?: PresetKey): readonly Stage[] {
+export function stagesFor(key: TransitionKey, previous?: PresetKey, depleted = false): readonly Stage[] {
+  if (key === 'cyanide' && depleted) {
+    const notes = [
+      '직전 조건에서 산소 소비와 H⁺ 기울기가 이미 0이다.',
+      '시안화합물이 복합체 IV에 결합해 O₂로의 전자 전달을 막는다.',
+      '말단에서 O₂가 환원되지 않아 산소 소비는 0으로 유지된다.',
+      '직전 조건에서 정지한 상류 전자전달은 계속 정지해 있다.',
+      '남아 있는 기울기가 없어 H⁺의 순 귀환도 0이다.',
+      'H⁺ 기울기가 없으므로 산화적 ATP 합성도 0으로 유지된다.',
+    ]
+    return cyanideStages.map((stage, i) => ({ ...stage, note: notes[i] ?? stage.note }))
+  }
   if (key === 'cyanide' && previous !== 'normal')
     return [{ ...cyanideStages[0], note: '직전 조건의 전자전달 속도와 H⁺ 기울기에서 시안화합물 처리를 시작한다.' }, ...cyanideStages.slice(1)]
   if (key !== 'normal') return stages[key]
