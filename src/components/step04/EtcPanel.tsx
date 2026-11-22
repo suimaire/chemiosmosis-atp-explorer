@@ -16,10 +16,12 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode, fra
   const [lowDetail, setLowDetail] = useState(false)
   useLayoutEffect(() => {
     latest.current = { state, paused }
-    scene.current?.update(state, paused)
-  }, [state, paused])
+    if (!staticMode) scene.current?.update(state, paused)
+  }, [state, paused, staticMode])
+  useLayoutEffect(() => {
+    if (staticMode) scene.current?.update(latest.current.state, true)
+  }, [staticMode])
   useEffect(() => {
-    if (staticMode) return
     let cancelled = false
     let instance: SceneController | undefined
     import('./EtcScene').then(({ createEtcScene }) => {
@@ -33,7 +35,7 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode, fra
       setMode('3d')
     }).catch(() => { if (!cancelled) setMode('fallback') })
     return () => { cancelled = true; instance?.dispose(); scene.current = null }
-  }, [staticMode])
+  }, [])
 
   const fallback = staticMode || mode !== '3d'
   const preset = presetKeyFor(condition)
@@ -50,7 +52,7 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode, fra
     data-density={state.protonDensity} data-motion-intensity={state.motionIntensity} data-particle-budget={state.particleBudget}>
     <header className="etc-panel-heading"><span className="etc-condition-letter">{name}</span><div><span>조건 {name}</span><h4>{preset ? presets[preset].label : '사용자 조절 조건'}</h4></div><span className="etc-render-label">{fallback ? '정적 개념도' : lowDetail || preferences.compact ? '3D (간략)' : '3D'}</span></header>
     <div className="etc-scene" role="img" aria-label={`조건 ${name}: 미토콘드리아 내막. ${sceneDescription}`}>
-      {!staticMode && <canvas ref={canvas} className={mode === '3d' ? '' : 'etc-canvas-hidden'} aria-hidden="true" />}
+      <canvas ref={canvas} className={fallback ? 'etc-canvas-hidden' : ''} aria-hidden="true" />
       <EtcDiagram state={state} fallback={fallback} />
     </div>
     <div className="etc-scene-caption">

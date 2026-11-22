@@ -47,7 +47,7 @@ export function EtcComparison3D({ a, b, aSource = 'preset', bSource = 'preset', 
     <div className="etc-grid">{([['A', a, aPlayback], ['B', b, bPlayback]] as const).map(([name, condition, playback]) =>
       <div className={`etc-column etc-column-${name.toLowerCase()}`} key={name}>
         {controls?.[name]?.preset}
-        <EtcPanel key={`${name}-${staticMode}`} name={name} condition={condition} preferences={preferences} paused={playback.frozen} staticMode={staticMode} frame={playback.frame}>
+        <EtcPanel name={name} condition={condition} preferences={preferences} paused={playback.frozen} staticMode={staticMode} frame={playback.frame}>
           <div className="etc-playback">
             <progress aria-label={`조건 ${name} 처리 과정 진행도`} value={playback.frame.elapsed} max={playback.frame.duration} />
             <div><button type="button" onClick={playback.restart}>{held ? '처음으로' : '다시 재생'}</button>
