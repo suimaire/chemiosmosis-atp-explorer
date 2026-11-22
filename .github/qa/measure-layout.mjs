@@ -46,6 +46,7 @@ async function measure(page, url, version, width, height) {
     assert(col.picker.bottom <= col.card.y + 1 && col.buttons.bottom <= col.sliders.y + 1)
   }
   if (version === 'after' && width >= 1440) {
+    console.log('FHD_GEOMETRY ' + JSON.stringify({width, scene: a.scene, metrics: a.metrics, buttons: a.buttons, sliders: a.sliders}))
     for (const col of result.columns) assert(col.metrics.every(m => m.y >= 0 && m.bottom <= height), 'all four readings should be visible at ' + width)
     await page.getByRole('button', { name: '정적 보기', exact: true }).click()
     await expect(page.getByTestId('etc-panel-b')).toHaveAttribute('data-render-mode', 'static')

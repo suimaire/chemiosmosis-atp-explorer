@@ -19,7 +19,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Install Korean fonts
-        run: sudo apt-get install -y fonts-noto-cjk
+        run: sudo apt-get install -y fonts-noto-cjk python3-pil
       - name: Build both revisions
         run: |
           git worktree add --detach "$RUNNER_TEMP/baseline" b2e72e871a4608db9e9cd5e4550428149c8f1bf4
@@ -42,7 +42,7 @@ jobs:
           path: verification/fhd-layout/
           retention-days: 14
       - name: Render first-viewport thumbnails for review
-        if: success()
+        if: ${{ !cancelled() }}
         run: |
           /usr/bin/python3 - <<'PY'
           from pathlib import Path
@@ -51,6 +51,7 @@ jobs:
           from base64 import b64encode
           root = Path("verification/fhd-layout")
           for name in ["before-1920", "after-1920", "after-1536", "after-1440", "after-1024", "after-768", "after-390"]:
+              if not (root / (name + ".png")).is_file(): continue
               im = Image.open(root / (name + ".png")).convert("RGB")
               im.thumbnail((1040, 720))
               out = BytesIO()
@@ -64,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: f57313dba29730ef3d9aa724e3bfc1f8638c329a
+          ref: b9f82758d65846ec4d96b6636e3e9b1755564915
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
