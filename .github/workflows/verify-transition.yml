@@ -1,12 +1,14 @@
-name: Verify cyanide transition
+name: Check published cyanide playback
 on:
   push:
     branches: [qa/cyanide-transition]
 permissions:
   contents: read
+  actions: read
 jobs:
-  verify:
+  live:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,7 +16,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm test
-      - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Wait for the Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run watch 44993482331 --interval 12 --exit-status
+      - name: Test A and B on the public site
+        env:
+          BASE_URL: https://suimaire.github.io/chemiosmosis-atp-explorer/
+        run: npm run test:e2e -- tests/step04-3d.spec.ts --grep 'cyanide playback separates' --retries=1
