@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { presetKeyFor, presets, relativeState, type Condition } from '../../science'
 import { mapAnimationState, relativeTrend, type DisplayPreferences } from './animationState'
 import { EtcDiagram } from './EtcDiagram'
@@ -14,7 +14,7 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode, fra
   const latest = useRef({ state, paused })
   const [mode, setMode] = useState<'loading' | '3d' | 'fallback'>('loading')
   const [lowDetail, setLowDetail] = useState(false)
-  useEffect(() => {
+  useLayoutEffect(() => {
     latest.current = { state, paused }
     scene.current?.update(state, paused)
   }, [state, paused])
@@ -40,7 +40,7 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode, fra
   const viewStatus = staticMode ? '정적 보기' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중' : paused ? '움직임 일시정지' : ''
   const sceneDescription = frame.stage.title + '. ' + frame.stage.note
   const trends = [
-    ['전자전달', 100 * state.electronFlowSpeed], ['H⁺ 기울기', 100 * state.protonDensity], ['ATP 합성', 100 * state.atpPulseRate], ['산소 소비', 100 * state.oxygenRate],
+    ['전자전달', 100 * state.electronFlowSpeed], ['H⁺ 기울기', frame.values.gradient], ['ATP 합성', frame.values.atp], ['산소 소비', frame.values.oxygen],
   ] as const
   return <section className={`etc-panel etc-panel-${name.toLowerCase()}`} aria-label={`조건 ${name} 3D 개념 모형`}
     data-stage={frame.index} data-complete={frame.complete} data-oxygen-rate={state.oxygenRate} data-testid={`etc-panel-${name.toLowerCase()}`} data-render-mode={staticMode ? 'static' : mode}

@@ -43,16 +43,16 @@ export function EtcComparison3D({ a, b, aSource = 'preset', bSource = 'preset', 
       <button type="button" aria-pressed={staticMode} onClick={() => setStaticMode(v => !v)}>{staticMode ? '3D 보기' : '정적 보기'}</button>
     </div></div>
     <EtcLegend />
-    {reducedMotion && <p className="etc-motion-note">동작 줄이기 설정으로 애니메이션을 20% 속도로 표시합니다.</p>}
+    {reducedMotion && <p className="etc-motion-note">동작 줄이기 설정으로 입자와 회전자의 움직임을 20% 속도로 표시합니다.</p>}
     <div className="etc-grid">{([['A', a, aPlayback], ['B', b, bPlayback]] as const).map(([name, condition, playback]) =>
       <div className={`etc-column etc-column-${name.toLowerCase()}`} key={name}>
         {controls?.[name]?.preset}
         <EtcPanel key={`${name}-${staticMode}`} name={name} condition={condition} preferences={preferences} paused={playback.frozen} staticMode={staticMode} frame={playback.frame}>
-          {playback.frame && <div className="etc-playback">
+          <div className="etc-playback">
             <progress aria-label={`조건 ${name} 처리 과정 진행도`} value={playback.frame.elapsed} max={playback.frame.duration} />
             <div><button type="button" onClick={playback.restart}>{held ? '처음으로' : '다시 재생'}</button>
             <button type="button" disabled={playback.frame.complete} onClick={playback.advance}>다음 단계</button>{playback.stepHold && !held && !playback.frame.complete && <button type="button" onClick={playback.resume}>이어서 재생</button>}</div>
-          </div>}
+          </div>
         </EtcPanel>
         {controls?.[name]?.adjust}
       </div>)}</div>

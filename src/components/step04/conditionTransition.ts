@@ -6,7 +6,7 @@ const reference = steadyState(normal)
 const referenceOut = normal.leak + 0.75 * normal.adp * normal.synthase
 type Controls = { input: number; synthase: number; leak: number; adp: number; iv: number; upper: number; terminal: number }
 type Snapshot = { controls: Controls; g: number; values: ReturnType<typeof relativeState>; electrons: number; leakRate: number }
-export type ConditionFrame = Snapshot & { elapsed: number; duration: number; index: number; stage: Stage; complete: boolean }
+export type ConditionFrame = Snapshot & { terminalBlock: boolean; elapsed: number; duration: number; index: number; stage: Stage; complete: boolean }
 export type ChangeSource = 'preset' | 'slider'
 
 function controlsFor(c: Condition): Controls {
@@ -39,7 +39,7 @@ function cyanideGates(time: number) {
 
 export function makeTransition(start: Snapshot, target: Condition, source: ChangeSource, previous?: PresetKey) {
   const key = source === 'slider' ? 'custom' : presetKeyFor(target) ?? 'custom'
-  const stages = stagesFor(key, previous)
+  const stages = stagesFor(key, previous, start.g === 0 && start.electrons === 0)
   const duration = stages[stages.length - 1].time
   const end = equilibrium(target)
   const from = start.controls, to = end.controls
@@ -96,7 +96,8 @@ export function makeTransition(start: Snapshot, target: Condition, source: Chang
     const i = Math.min(gradients.length - 1, Math.floor(elapsed / step))
     const state = complete ? end : elapsed === 0 ? start :
       snapshot(controlsAt(elapsed), integrate(gradients[i], i * step, elapsed))
-    return { ...state, elapsed, duration, index, stage: stages[index], complete }
+    const terminalBlock = state.controls.iv < 0.999999 || (key === 'cyanide' && index > 0)
+    return { ...state, terminalBlock, elapsed, duration, index, stage: stages[index], complete }
   }
   return { duration, stages, frameAt }
 }

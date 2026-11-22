@@ -35,7 +35,7 @@ export function mapAnimationState(condition: Condition, output: ReturnType<typeo
     atpPulseRate: values.atp / 100,
     protonLeakRate: frame?.leakRate ?? condition.leak * flux.gradient / reference.oxygen,
     leakActive: controls.leak > normal.leak + 0.000001,
-    complexIVBlocked: frame ? frame.controls.iv < 0.999999 || frame.stage.title === '복합체 IV 억제' : condition.complexIVActivity === 0,
+    complexIVBlocked: frame?.terminalBlock ?? (condition.complexIVActivity === 0),
     inputStopped: controls.input === 0,
     inputReduced: controls.input > 0 && controls.input < 0.999999,
     adpLimited: controls.adp < 0.5,
