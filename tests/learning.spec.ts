@@ -68,6 +68,7 @@ for (const size of sizes) {
     await expect(page.getByText('H⁺ 이동에서 방출되는 자유에너지가 ATP 합성에 필요한 양보다 크다.', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: '03 미토콘드리아 조건 비교', exact: true }).click()
     await page.getByRole('combobox', { name: '조건 B 처리', exact: true }).selectOption('leak')
+    await expect(page.getByTestId('etc-panel-b')).toHaveAttribute('data-complete', 'true', {timeout: 15000})
     expect(Number(await page.getByLabel('B 산소 소비', { exact: true }).textContent())).toBeGreaterThan(100)
     expect(Number(await page.getByLabel('B 산화적 ATP 합성 속도', { exact: true }).textContent())).toBeLessThan(100)
     await noOverflow(page); await shot(page, `${size.width}-experiment`)

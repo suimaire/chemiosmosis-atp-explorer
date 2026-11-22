@@ -38,7 +38,7 @@ export function ConceptMembrane({ paths, context = 'mito' }: { paths: PathVisibi
       if (cancelled || !canvas.current) return
       instance = createScene(canvas.current, latest.current.state, {
         onFailure: () => { if (!cancelled) setMode('fallback') },
-        onTransition: () => {}, onLowDetail: () => {},
+        onLowDetail: () => {},
       }, { concept: true, paths: latest.current.paths })
       controller.current = instance
       instance.update(latest.current.state, latest.current.paused || latest.current.state.motionIntensity < 1)

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bridge, PageTitle, Quiz } from './components/Shared'
 import { Membrane, compartments } from './components/Membrane'
+import type { ChangeSource } from './components/step04/conditionTransition'
 import { EtcComparison3D } from './components/step04/EtcComparison3D'
 import { ConceptMembrane } from './components/explorer/ConceptMembrane'
 import { CouplingLesson, GradientLesson, Range } from './components/explorer/EnergyLessons'
@@ -15,6 +16,8 @@ export function Explorer() {
   const [gradient, setGradient] = useState<Gradient>(defaultGradient)
   const [ratio, setRatio] = useState(3.3)
   const [requirement, setRequirement] = useState(50)
+  const [aSource, setASource] = useState<ChangeSource>('preset')
+  const [bSource, setBSource] = useState<ChangeSource>('preset')
   const [a, setA] = useState<Condition>({ ...normal })
   const [b, setB] = useState<Condition>({ ...presets.inhibited.condition })
   const compartment = compartments[context]
@@ -51,14 +54,14 @@ export function Explorer() {
       {module === 2 && <CouplingLesson gradient={gradient} ratio={ratio} requirement={requirement} setRatio={setRatio} setRequirement={setRequirement} onGradient={() => setModule(1)} />}
       {module === 3 && <>
         <p className="step-lead">A와 B의 처리 조건을 선택하세요. 개별 변수는 각 그림 아래에서 조절할 수 있습니다.</p>
-        <EtcComparison3D a={a} b={b} controls={{
-          A: { preset: <PresetPicker name="A" value={a} setValue={setA} />, adjust: <ConditionControls name="A" value={a} setValue={setA} /> },
-          B: { preset: <PresetPicker name="B" value={b} setValue={setB} />, adjust: <ConditionControls name="B" value={b} setValue={setB} /> },
+        <EtcComparison3D a={a} b={b} aSource={aSource} bSource={bSource} controls={{
+          A: { preset: <PresetPicker name="A" value={a} setValue={v => { setASource('preset'); setA(v) }} />, adjust: <ConditionControls name="A" value={a} setValue={v => { setASource('slider'); setA(v) }} /> },
+          B: { preset: <PresetPicker name="B" value={b} setValue={v => { setBSource('preset'); setB(v) }} />, adjust: <ConditionControls name="B" value={b} setValue={v => { setBSource('slider'); setB(v) }} /> },
         }} renderResults={(values, transient) => <section className="results-block" aria-labelledby="ab-results-title">
           <h3 id="ab-results-title" className="lesson-section-title">{transient ? '처리 과정의 산소 소비, H⁺ 기울기, ATP 합성' : '정상상태의 산소 소비, H⁺ 기울기, ATP 합성'}</h3>
           <Results values={values} />
         </section>} />
-        <p className="quiet">시안화합물 처리 과정은 정상 결합 상태에서 시작한다. 재생 시간은 변화 순서를 관찰하기 위한 교육용 시간이다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>유효 전자전달 입력 E는 전자 공급량(input)과 복합체 IV 활성(작동 시 1, 완전 억제 시 0)의 곱이다. 무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = E × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = E / (E + leak + 0.75 × ADP × synthase)이다.</p><p>leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
+        <p className="quiet">각 처리는 해당 카드에 표시된 상태에서 시작한다. 재생 시간은 변화 순서를 보여 주는 교육용 시간이다. ATP 합성 속도에는 산화적 인산화만 포함한다.</p><details><summary>정상상태 계산식</summary><p>유효 전자전달 입력 E는 전자 공급량(input)과 복합체 IV 활성(작동 시 1, 완전 억제 시 0)의 곱이다. 무차원 기울기 g에서 전자전달에 의한 H⁺ 유입은 J = E × (1 − g), 누출은 leak × g, ATP 합성효소를 통한 유출은 0.75 × ADP × synthase × g이다. 정상상태에서는 유입과 총유출이 같으므로 g = E / (E + leak + 0.75 × ADP × synthase)이다.</p><p>leak는 H⁺ 누출 전도도, ADP와 synthase는 각각 ADP 가용성과 ATP 합성 경로 활성이다. 산소 소비는 J에, 산화적 ATP 합성 속도는 ATP 합성효소를 통한 유출에 비례한다. 이 속도 계산은 모듈 01과 02의 자유에너지 계산과 독립적이다.</p></details>
       </>}
       {module === 4 && <Inference />}
       {module === 5 && <><p className="step-lead">두 막에서 ATP 합성효소의 촉매 부위는 어느 쪽을 향하며, H⁺는 어느 방향으로 이동하는가?</p><div className="diagram-panel"><Membrane context="plant" /></div><Bridge /><Quiz questions={[

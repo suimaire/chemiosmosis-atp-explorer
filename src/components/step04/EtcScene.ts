@@ -1,10 +1,10 @@
 import * as THREE from 'three'
-import { STOP_TRANSITION_SECONDS, stopTransition, type AnimationState } from './animationState'
+import type { AnimationState } from './animationState'
 import { complexes, electronPaths, leakX, synthaseX, terminalElectronPath, type Point } from './sceneLayout'
 
 export type PathVisibility = { electrons: boolean; protons: boolean; atp: boolean }
 export type SceneController = { update: (state: AnimationState, paused: boolean) => void; setPaths: (paths: PathVisibility) => void; dispose: () => void }
-export type SceneCallbacks = { onFailure: () => void; onTransition: (active: boolean) => void; onLowDetail: () => void }
+export type SceneCallbacks = { onFailure: () => void; onLowDetail: () => void }
 
 export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationState, callbacks: SceneCallbacks, options: { concept?: boolean; paths?: PathVisibility } = {}): SceneController {
   let paths = options.paths ?? { electrons: true, protons: true, atp: true }
@@ -109,7 +109,7 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
   }
   const electronCurves = visibleElectronPaths.map(cumulative), pumpCurves = pumpPaths.map(cumulative)
   const returnCurve = cumulative(returnPath), leakCurve = cumulative(leakPath)
-  let target = initial, displayed = initial, previous = initial, elapsed = STOP_TRANSITION_SECONDS
+  let target = initial
   let paused = false, disposed = false, inView = true, raf = 0, last = 0, frames = 0, slowFrames = 0, lowDetail = false
   const phases = { electron: 0, pump: 0, synthase: 0, leak: 0, atp: 0, oxygen: 0 }
   const movePool = (pool: THREE.Mesh[], curve: ReturnType<typeof cumulative>, phase: number, rate: number, budget: number) => {
@@ -117,12 +117,7 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     pool.forEach((m, i) => { m.visible = i < count; if (m.visible) curve((phase + i / count) % 1, m.position) })
   }
   function render(dt: number) {
-    if (elapsed < STOP_TRANSITION_SECONDS) {
-      elapsed = Math.min(STOP_TRANSITION_SECONDS, elapsed + dt)
-      displayed = stopTransition(previous, target, elapsed)
-      if (elapsed === STOP_TRANSITION_SECONDS) callbacks.onTransition(false)
-    } else displayed = target
-    const s = displayed, motion = paused ? 0 : s.motionIntensity
+    const s = target, motion = paused ? 0 : s.motionIntensity
     const budget = s.particleBudget * (lowDetail ? 0.5 : 1)
     phases.electron += dt * s.electronFlowSpeed * 0.25 * motion
     phases.pump += dt * s.protonPumpRate * 0.5 * motion
@@ -140,10 +135,10 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
       const terminal = pumpingComplexes[i].name === 'IV'
       const rate = terminal ? s.oxygenRate : s.protonPumpRate
       movePool(pool, pumpCurves[i], terminal ? phases.oxygen : phases.pump, rate, budget)
-      pumpLines[i].visible = pumpArrows[i].visible = paths.protons && (!s.complexIVBlocked || rate > 0)
+      pumpLines[i].visible = pumpArrows[i].visible = paths.protons && rate > 0
     })
     movePool(returns, returnCurve, phases.synthase, s.synthaseRotationSpeed, budget)
-    const showLeak = s.leakActive || (s.complexIVBlocked && s.protonLeakRate > 0)
+    const showLeak = s.leakActive || ((s.complexIVBlocked || s.inputStopped) && s.protonLeakRate > 0)
     movePool(leaks, leakCurve, phases.leak, showLeak ? s.protonLeakRate : 0, budget)
     leakTube.visible = showLeak
     rotor.rotation.y = phases.synthase * Math.PI * 2
@@ -172,7 +167,7 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     electrons.flat().forEach(m => { m.visible = m.visible && paths.electrons })
     cloud.visible = paths.protons
     pumps.flat().forEach(m => { m.visible = m.visible && paths.protons })
-    returnLine.visible = returnArrow.visible = paths.atp && (!s.complexIVBlocked || s.synthaseRotationSpeed > 0)
+    returnLine.visible = returnArrow.visible = paths.atp && s.synthaseRotationSpeed > 0
     rotor.visible = paths.atp
     returns.forEach(m => { m.visible = m.visible && paths.atp })
     atps.forEach(m => { m.visible = m.visible && paths.atp })
@@ -206,7 +201,9 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
     if (raf) cancelAnimationFrame(raf)
     raf = 0; last = 0
     canvas.dataset.motion = paused ? 'paused' : !inView ? 'offscreen' : document.hidden ? 'hidden' : disposed ? 'disposed' : 'running'
-    if (!disposed && !paused && inView && !document.hidden) raf = requestAnimationFrame(tick)
+    if (disposed || !inView || document.hidden) return
+    if (paused) { try { render(0) } catch { fail() } }
+    else raf = requestAnimationFrame(tick)
   }
   const resize = new ResizeObserver(() => {
     if (disposed) return
@@ -231,13 +228,13 @@ export function createEtcScene(canvas: HTMLCanvasElement, initial: AnimationStat
   return {
     setPaths(nextPaths) { paths = nextPaths; if (!disposed) { try { render(0) } catch { fail() } } },
     update(state, isPaused) {
-      const changed = state !== target
-      if (changed && !state.complexIVBlocked && state.inputStopped && !target.inputStopped && state.motionIntensity === 1 && !isPaused && inView) {
-        previous = displayed; elapsed = 0; callbacks.onTransition(true)
-      } else if (changed || isPaused) { elapsed = STOP_TRANSITION_SECONDS; callbacks.onTransition(false) }
       const pauseChanged = paused !== isPaused
       target = state; paused = isPaused
-      try { render(0); if (pauseChanged) schedule() } catch { fail() }
+      if (disposed) return
+      try {
+        if (pauseChanged) schedule()
+        else if (paused && inView && !document.hidden) render(0)
+      } catch { fail() }
     },
     dispose,
   }

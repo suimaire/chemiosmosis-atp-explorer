@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { normal, presets, relativeState, steadyState, type Condition } from '../../science'
-import { mapAnimationState, STOP_TRANSITION_SECONDS, stopTransition } from './animationState'
+import { mapAnimationState } from './animationState'
 import { EtcComparison3D } from './EtcComparison3D'
-import { cyanideDuration, cyanideFrame } from './cyanideTransition'
+import { equilibrium, makeTransition } from './conditionTransition'
+import { cyanideDuration } from './cyanideTransition'
 import { complexes, electronPaths } from './sceneLayout'
 
 const preferences = { reducedMotion: false, compact: false }
@@ -71,20 +72,10 @@ describe('Step 04 output-to-animation mapping', () => {
     expect(state.protonDensity).toBe(reference.protonDensity)
     expect(state.atpPulseRate).toBe(reference.atpPulseRate)
   })
-  it('stops new pumping immediately, fades the prior reservoir, and reaches exactly zero', () => {
-    const stopped = map(presets.stopped.condition)
-    const halfway = stopTransition(reference, stopped, STOP_TRANSITION_SECONDS / 2)
-    expect(halfway.electronFlowSpeed).toBe(0)
-    expect(halfway.protonPumpRate).toBe(0)
-    expect(halfway.protonDensity).toBeGreaterThan(0)
-    expect(halfway.protonDensity).toBeLessThan(reference.protonDensity)
-    expect(halfway.synthaseRotationSpeed).toBeGreaterThan(0)
-    expect(stopTransition(reference, stopped, STOP_TRANSITION_SECONDS)).toEqual(stopped)
-    expect(stopTransition(reference, stopped, 10)).toEqual(stopped)
-  })
   it('retains the proton gradient and basal leak after the terminal oxygen reaction stops', () => {
     const treated = presets.cyanide.condition
-    const stateAt = (seconds: number) => mapAnimationState(treated, relativeState(treated), preferences, cyanideFrame(seconds))
+    const plan = makeTransition(equilibrium(normal), treated, 'preset', 'normal')
+    const stateAt = (seconds: number) => mapAnimationState(treated, relativeState(treated), preferences, plan.frameAt(seconds))
     expect(stateAt(0)).toEqual(reference)
     const terminal = stateAt(2), upstream = stateAt(3.1), reservoir = stateAt(4.6)
     expect(terminal.oxygenRate).toBe(0)
@@ -99,9 +90,9 @@ describe('Step 04 output-to-animation mapping', () => {
       const state = stateAt(t)
       for (const key of ['oxygenRate','electronFlowSpeed','protonDensity','atpPulseRate'] as const) {
         expect(state[key]).toBeGreaterThanOrEqual(0)
-        expect(state[key]).toBeLessThanOrEqual(prior[key])
+        expect(state[key]).toBeLessThanOrEqual(prior[key] + 1e-12)
       }
-      expect(state.atpPulseRate).toBe(state.protonDensity)
+      expect(state.atpPulseRate).toBeCloseTo(state.protonDensity, 10)
       prior = state
     }
     expect(stateAt(cyanideDuration)).toEqual(map(treated))
