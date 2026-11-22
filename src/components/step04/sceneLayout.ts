@@ -11,8 +11,11 @@ export const leakX = 5.8
 export function project([x, y, z]: Point) {
   return { x: (x + 6.8) * 50, y: 225 - (12 * y - 5 * z) / 13 * 50 }
 }
+// Separate cyt c → IV → O₂ from electron transfers upstream of cyt c.
+export const terminalElectronPath: Point[] = [[0.45, 1.25, 0.6], [1.45, 1.25, 0.6], [1.45, -0.9, 0.6], [2.15, -1.9, 0.6]]
 export const electronPaths: Point[][] = [
   [[-5.65, -2.05, 0.6], [-4.7, -0.75, 0.6], [-4.7, 0.1, 1.12], [-1.8, 0.1, 1.12]],
   [[-2.8, -2.05, 0.6], [-2.8, -0.4, 1.12], [-1.8, 0.1, 1.12]],
-  [[-1.8, 0.1, 1.12], [-0.7, 0.1, 1.12], [-0.7, 1.25, 0.6], [1.45, 1.25, 0.6], [1.45, -0.9, 0.6], [2.15, -1.9, 0.6]],
+  [[-1.8, 0.1, 1.12], [-0.7, 0.1, 1.12], [-0.7, 1.25, 0.6], [0.45, 1.25, 0.6]],
+  terminalElectronPath,
 ]

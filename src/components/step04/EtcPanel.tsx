@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { presetKeyFor, presets, relativeState, type Condition } from '../../science'
 import { mapAnimationState, relativeTrend, type DisplayPreferences } from './animationState'
 import { EtcDiagram } from './EtcDiagram'
+import type { CyanideFrame } from './cyanideTransition'
 import type { SceneController } from './EtcScene'
 
-type Props = { name: 'A' | 'B'; condition: Condition; preferences: DisplayPreferences; paused: boolean; staticMode: boolean }
-export function EtcPanel({ name, condition, preferences, paused, staticMode }: Props) {
+type Props = { name: 'A' | 'B'; condition: Condition; preferences: DisplayPreferences; paused: boolean; staticMode: boolean; frame: CyanideFrame | null; children?: ReactNode }
+export function EtcPanel({ name, condition, preferences, paused, staticMode, frame, children }: Props) {
   const output = useMemo(() => relativeState(condition), [condition])
-  const state = useMemo(() => mapAnimationState(condition, output, preferences), [condition, output, preferences])
+  const state = useMemo(() => mapAnimationState(condition, output, preferences, frame), [condition, output, preferences, frame])
   const canvas = useRef<HTMLCanvasElement>(null)
   const scene = useRef<SceneController | null>(null)
   const latest = useRef({ state, paused })
@@ -39,20 +40,20 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode }: P
   const fallback = staticMode || mode !== '3d'
   const preset = presetKeyFor(condition)
   const viewStatus = staticMode ? '정적 보기' : mode === 'fallback' ? '3D를 사용할 수 없어 정적 개념도를 표시합니다.' : mode === 'loading' ? '3D 모형 준비 중' : paused ? '움직임 일시정지' : ''
-  const sceneDescription = state.complexIVBlocked ? '복합체 IV 억제. O₂ 환원과 산소 소비가 중단되고 H⁺ 기울기가 소실된 정상상태.' :
+  const sceneDescription = frame ? frame.stage.title + '. ' + frame.stage.note : state.complexIVBlocked ? '복합체 IV 억제. O₂ 환원과 산소 소비가 중단되고 H⁺ 기울기가 소실된 정상상태.' :
     state.inputStopped ? '전자 공급 중단. NADH와 효소 결합 FADH₂에서 전자가 공급되지 않는다.' :
     '복합체 I, III, IV의 H⁺ 수송 경로와 ATP 합성효소를 통한 H⁺ 이동 경로.'
-  const conditionNote = state.complexIVBlocked ? presets.cyanide.explanation :
+  const conditionNote = frame ? frame.stage.note : state.complexIVBlocked ? presets.cyanide.explanation :
     transition ? '기울기 소실 중 (수치는 소진 후 정상상태)' :
     state.inputStopped ? '전자 공급이 중단되어 H⁺ 기울기가 소진된 상태' :
     state.adpLimited ? 'ADP 부족으로 ATP 합성 속도가 감소한다.' :
     state.synthaseInhibited ? 'ATP 합성효소를 통한 H⁺ 이동이 억제된다.' :
     state.leakActive ? 'H⁺가 ATP 합성효소를 우회해 기질로 돌아간다.' : 'H⁺ 유입량과 유출량이 같은 정상상태'
   const trends = [
-    ['전자전달', output.oxygen], ['H⁺ 기울기', output.gradient], ['ATP 합성', output.atp], ['산소 소비', output.oxygen],
+    ['전자전달', 100 * state.electronFlowSpeed], ['H⁺ 기울기', 100 * state.protonDensity], ['ATP 합성', 100 * state.atpPulseRate], ['산소 소비', 100 * state.oxygenRate],
   ] as const
   return <section className={`etc-panel etc-panel-${name.toLowerCase()}`} aria-label={`조건 ${name} 3D 개념 모형`}
-    data-testid={`etc-panel-${name.toLowerCase()}`} data-render-mode={staticMode ? 'static' : mode}
+    data-stage={frame?.index} data-oxygen-rate={state.oxygenRate} data-testid={`etc-panel-${name.toLowerCase()}`} data-render-mode={staticMode ? 'static' : mode}
     data-electron-speed={state.electronFlowSpeed} data-pump-rate={state.protonPumpRate}
     data-leak-active={state.leakActive} data-leak-rate={state.protonLeakRate}
     data-rotation-speed={state.synthaseRotationSpeed} data-atp-rate={state.atpPulseRate}
@@ -63,14 +64,15 @@ export function EtcPanel({ name, condition, preferences, paused, staticMode }: P
       <EtcDiagram state={state} fallback={fallback} />
     </div>
     <div className="etc-scene-caption">
-      {state.complexIVBlocked ? <strong>복합체 I, III, IV의 H⁺ 수송 중단</strong> : <>
+      {frame ? <strong>{frame.stage.title}</strong> : state.complexIVBlocked ? <strong>복합체 I, III, IV의 H⁺ 수송 중단</strong> : <>
         <span>↑ H⁺ 수송 (I, III, IV)</span><span>↓ ATP 합성효소를 통한 H⁺ 이동</span>
         <strong>{state.leakActive ? '↓ H⁺ 누출' : '복합체 II의 H⁺ 수송 없음'}</strong>
       </>}
     </div>
-    <dl className="etc-summary" aria-label={`조건 ${name} 시각화 요약`} aria-live="polite" aria-atomic="true">
+    <dl className="etc-summary" aria-label={`조건 ${name} 시각화 요약`} aria-live={frame ? 'off' : 'polite'} aria-atomic="true">
       {trends.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{label === 'H⁺ 기울기' && value === 0 ? '소실' : relativeTrend(value)} <small>{value.toFixed(1)}</small></dd></div>)}
     </dl>
     <p className="etc-state-note" role="status">{viewStatus && <span className="etc-view-status">{viewStatus}</span>}{conditionNote}</p>
+    {children}
   </section>
 }
