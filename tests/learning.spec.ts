@@ -118,8 +118,13 @@ test('production counter import failure does not interrupt the app', async ({ pa
   await page.route('https://suimaire.github.io/assets/js/page-views.js', route => route.abort())
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('https://suimaire.github.io/chemiosmosis-atp-explorer/')
-  await page.getByRole('link', { name: '탐색기 열기 →', exact: true }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('화학삼투와 ATP 합성 탐색기')
-  expect(errors).toEqual([])
+  try {
+    await page.goto('https://suimaire.github.io/chemiosmosis-atp-explorer/')
+    await page.getByRole('link', { name: '탐색기 열기 →', exact: true }).click()
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('화학삼투와 ATP 합성 탐색기')
+    expect(errors).toEqual([])
+  } finally {
+    // The explorer may still be fetching its lazy Three.js chunk when the page heading appears.
+    await page.unrouteAll({ behavior: 'wait' })
+  }
 })
